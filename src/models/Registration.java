@@ -1,0 +1,34 @@
+package models;
+
+import enums.RegistrationStatus;
+
+public class Registration {
+    private Student student;
+    private Course course;
+    private RegistrationStatus status;
+
+    public Registration(Student student, Course course) {
+        this.student = student;
+        this.course = course;
+        this.status = RegistrationStatus.PENDING;
+    }
+
+    public void approve() {
+        this.status = RegistrationStatus.APPROVED;
+        course.addStudent(student);
+    }
+
+    public void reject() {
+        this.status = RegistrationStatus.REJECTED;
+    }
+
+    public RegistrationStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public String toString() {
+        return student.getFullName() + " -> " + course + " [" + status + "]";
+    }
+    
+}
