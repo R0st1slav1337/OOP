@@ -9,6 +9,7 @@ public class Course {
     private int credits;
     private List<Teacher> instructors = new ArrayList<>();
     private List<Student> students = new ArrayList<>();
+    private List<Lesson> lessons = new ArrayList<>();
 
     public Course(String code, String name, int credits) {
         this.code = code;
@@ -24,13 +25,37 @@ public class Course {
         students.add(student);
     }
 
+    public void addLesson(Lesson lesson) {
+        lessons.add(lesson);
+    }
+
     public int getCredits() {
         return credits;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Teacher> getInstructors() {
+        return instructors;
+    }
+
+    public List<Student> getStrudents() {
+        return students;
+    }
+
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+
     @Override
     public String toString() {
-        return code + " - " + name;
+        return code + " - " + name + " (" + credits + " credits)";
     }
     
 }

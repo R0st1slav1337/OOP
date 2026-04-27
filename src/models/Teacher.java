@@ -11,15 +11,28 @@ public class Teacher extends Employee implements Researcher {
     private List<ResearchPaper> researchPapers = new ArrayList<>();
     private int hIndex;
 
-    public Teacher(String id, String username, String password, String fullName, double salary, 
+    public Teacher(String id, String username, String password, String fullName, double salary, String department, 
         TeacherTitle title, int hIndex) {
-            super(id, username, password, fullName, salary);
+            super(id, username, password, fullName, salary, department);
             this.title = title;
             this.hIndex = hIndex;
     }
 
+    public void assignCourse(Course course) {
+        courses.add(course);
+        course.addInstructor(this);
+    }
+
     public void putMark(Student student, Course course, Mark mark) {
         student.addMark(course, mark);
+    }
+
+     public TeacherTitle getTitle() {
+        return title;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
     }
 
     @Override
