@@ -22,6 +22,8 @@ public class Manager extends Employee {
 
     public void approveRegistration(Registration registration) {
         registration.approve();
+        registration.getStudent().addCourse(registration.getCourse());
+        registration.getCourse().addStudent(registration.getStudent());
     }
 
     public void rejectRegistration(Registration registration) {
@@ -29,8 +31,7 @@ public class Manager extends Employee {
     }
 
     public void assignTeacher(Course course, Teacher teacher) {
-        // teacher.assignCourse(course);
-        course.addInstructor(teacher);
+        teacher.assignCourse(course);
     }
 
     public void viewStudentsSortedByGpa(List<Student> students) {
@@ -40,6 +41,10 @@ public class Manager extends Employee {
 
     public ManagerType getManagerType() {
         return managerType;
+    }
+
+    public List<Registration> getRegistrations() {
+        return registrations;
     }
 
     @Override

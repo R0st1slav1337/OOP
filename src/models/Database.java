@@ -40,8 +40,7 @@ public class Database {
 
         for (User user: users) {
             if (user instanceof Researcher researcher) {
-                int totalCitations = researcher.getResearchPapers().stream()
-                .mapToInt(ResearchPaper::getCitations).sum();
+                int totalCitations = researcher.getTotalCitations();
 
                 if (totalCitations > maxCitations) {
                     maxCitations = totalCitations;

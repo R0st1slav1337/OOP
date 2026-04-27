@@ -7,6 +7,7 @@ public class Course {
     private String code;
     private String name;
     private int credits;
+
     private List<Teacher> instructors = new ArrayList<>();
     private List<Student> students = new ArrayList<>();
     private List<Lesson> lessons = new ArrayList<>();
@@ -18,11 +19,15 @@ public class Course {
     }
 
     public void addInstructor(Teacher teacher) {
-        instructors.add(teacher);
+        if (!instructors.contains(teacher)) {
+            instructors.add(teacher);
+        }
     }
 
     public void addStudent(Student student) {
-        students.add(student);
+        if (!students.contains(student)) {
+            students.add(student);
+        }
     }
 
     public void addLesson(Lesson lesson) {

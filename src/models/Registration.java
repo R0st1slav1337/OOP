@@ -26,6 +26,14 @@ public class Registration {
         return status;
     }
 
+    public Student getStudent() {
+        return student;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
     @Override
     public String toString() {
         return student.getFullName() + " -> " + course + " [" + status + "]";

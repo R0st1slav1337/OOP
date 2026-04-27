@@ -31,14 +31,19 @@ public class Student extends User implements Researcher {
         this.hIndex = hIndex;
     }
 
-    public void registerCourse(Course course) {
-        if (totalCredits + course.getCredits() > 21) {
-            System.out.println("Cannot register: credit limit exceeded.");
-            return;
+    public Registration requestRegistration(Course course) {
+        if (totalCredits + course.getCredits() > 21 ) {
+            System.out.println("Cannot register: credit limit exceeded");
+            return null;
         }
+        return new Registration(this, course);
+    }
 
-        courses.add(course);
-        totalCredits += course.getCredits();
+    void addCourse(Course course) {
+        if (!courses.contains(course)) {
+            courses.add(course);
+            totalCredits += course.getCredits();
+        }
     }
 
     public void setSupervisor(Researcher supervisor) throws LowHIndexException {
