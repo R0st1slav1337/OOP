@@ -3,6 +3,8 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.crypto.Data;
+
 public class Admin extends Employee {
     private List<User> users = new ArrayList<>();
 
@@ -10,15 +12,17 @@ public class Admin extends Employee {
         super(id, username, password, fullName, salary, department);
     }
 
-    public void addUser(User user) {
-        users.add(user);
+    public void addUser(Database database, User user) {
+        database.addUser(user);
     }
 
-    public void removeUser(User user) {
-        users.remove(user);
+    public void removeUser(Database database, User user) {
+        database.removeUser(user);
     }
 
-    public void viewUsers() {
+    public void viewUsers(Database database) {
+        List<User> users = database.getUsers();
+        
         for (User user : users) {
             System.out.println(user);
         }
