@@ -6,7 +6,8 @@ public class Employee extends User {
 
     public Employee() {}
 
-    public Employee(String id, String username, String password, String fullName, double salary, String department) {
+    public Employee(String id, String username, String password, 
+                    String fullName, double salary, String department) {
         super(id, username, password, fullName);
         this.salary = salary;
         this.department = department;
@@ -14,6 +15,14 @@ public class Employee extends User {
 
     public void sendMessage(Employee employee, String message) {
         System.out.println(fullName + " send message to " + employee.fullName + ": " + message);
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public String getDepartment() {
+        return department;
     }
 
     @Override

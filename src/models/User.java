@@ -32,6 +32,18 @@ public abstract class User implements Serializable {
         return fullName;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     @Override
     public String toString() {
         return fullName + " (" + username + ")";
@@ -40,8 +52,7 @@ public abstract class User implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
+        if (!(o instanceof User user)) return false;
         return Objects.equals(id, user.id);
     }
 

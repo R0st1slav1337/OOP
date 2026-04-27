@@ -14,16 +14,28 @@ public class ResearchProject {
         this.topic = topic;
     }
 
-    public void addParticipant(Object person) throws NotResearcherException {
-        if (!(person instanceof Researcher)) {
+    public void addParticipant(User user) throws NotResearcherException {
+        if (!(user instanceof Researcher)) {
             throw new NotResearcherException("Only researchers can join research project.");
         }
 
-        participants.add((Researcher) person);
+        participants.add((Researcher) user);
     }
 
     public void addPaper(ResearchPaper paper) {
         publishedPapers.add(paper);
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public List<ResearchPaper> getPublishedPapers() {
+        return publishedPapers;
+    }
+
+    public List<Researcher> getParticipants() {
+        return participants;
     }
 
     @Override

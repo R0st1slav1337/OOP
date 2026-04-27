@@ -11,8 +11,8 @@ public class Teacher extends Employee implements Researcher {
     private List<ResearchPaper> researchPapers = new ArrayList<>();
     private int hIndex;
 
-    public Teacher(String id, String username, String password, String fullName, double salary, String department, 
-        TeacherTitle title, int hIndex) {
+    public Teacher(String id, String username, String password, String fullName, 
+                    double salary, String department, TeacherTitle title, int hIndex) {
             super(id, username, password, fullName, salary, department);
             this.title = title;
             this.hIndex = hIndex;
@@ -27,7 +27,13 @@ public class Teacher extends Employee implements Researcher {
         student.addMark(course, mark);
     }
 
-     public TeacherTitle getTitle() {
+    public void viewCourses() {
+        for (Course course : courses) {
+            System.out.println(course);
+        }
+    }
+
+    public TeacherTitle getTitle() {
         return title;
     }
 

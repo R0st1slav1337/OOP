@@ -2,6 +2,7 @@ package models;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 public class ResearchPaper implements Comparable<ResearchPaper> {
     private String title;
@@ -23,6 +24,18 @@ public class ResearchPaper implements Comparable<ResearchPaper> {
         this.doi = doi;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public List<String> getAuthors() {
+        return authors;
+    }
+
+    public String getJournal() {
+        return journal;
+    }
+
     public int getPages() {
         return pages;
     }
@@ -35,6 +48,10 @@ public class ResearchPaper implements Comparable<ResearchPaper> {
         return publicationDate;
     }
 
+    public String getDoi() {
+        return doi;
+    }
+
     @Override
     public int compareTo(ResearchPaper other) {
         return this.title.compareTo(other.title);
@@ -43,5 +60,18 @@ public class ResearchPaper implements Comparable<ResearchPaper> {
     @Override
     public String toString() {
         return title + " | Citations: " + citations + " | Date: " + publicationDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ResearchPaper)) return false;
+        ResearchPaper that = (ResearchPaper) o;
+        return Objects.equals(doi, that.doi);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(doi);
     }
 }

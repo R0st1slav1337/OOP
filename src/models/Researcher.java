@@ -14,4 +14,8 @@ public interface Researcher {
         getResearchPapers().stream().sorted(comparator).forEach(System.out::println);
     }
 
+    default int getTotalCitations() {
+        return getResearchPapers().stream().mapToInt(ResearchPaper::getCitations).sum();
+    }
+
 }

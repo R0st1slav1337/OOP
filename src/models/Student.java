@@ -2,19 +2,25 @@ package models;
 
 import exceptions.LowHIndexException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import java.util.Comparator;
 
 public class Student extends User implements Researcher {
     private int year;
     private String major;
     private double gpa;
     private int totalCredits;
+    private int hIndex;
     private Researcher supervisor;
 
     private Map<Course, Mark> marks = new HashMap<>();
     private List<Course> courses = new ArrayList<>();
     private List<ResearchPaper> researchPapers = new ArrayList<>();
-    private int hIndex;
+    
 
     public Student(String id, String username, String password, String fullName,
                    int year, String major, double gpa, int hIndex) {
@@ -35,8 +41,6 @@ public class Student extends User implements Researcher {
         totalCredits += course.getCredits();
     }
 
-  
-
     public void setSupervisor(Researcher supervisor) throws LowHIndexException {
         if (year == 4 && supervisor.getHIndex() < 3) {
             throw new LowHIndexException("Supervisor h-index must be at least 3.");
@@ -53,6 +57,22 @@ public class Student extends User implements Researcher {
         for (Course course : marks.keySet()) {
             System.out.println(course + " -> " + marks.get(course));
         }
+    }
+
+    public void viewCourses() {
+        for (Course course : courses) {
+            System.out.println(course);
+        }
+    }
+
+    public Transcript getTranscript() {
+        Transcript transcript = new Transcript(this);
+
+        for (Course course : marks.keySet()) {
+            transcript.addMark(course, marks.get(course));
+        }
+
+        return transcript;
     }
 
     public int getYear() {
