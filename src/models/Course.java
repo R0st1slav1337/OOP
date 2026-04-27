@@ -45,7 +45,7 @@ public class Course {
         return instructors;
     }
 
-    public List<Student> getStrudents() {
+    public List<Student> getStudents() {
         return students;
     }
 

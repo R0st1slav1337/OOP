@@ -3,8 +3,6 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.crypto.Data;
-
 public class Admin extends Employee {
     private List<User> users = new ArrayList<>();
 
@@ -22,7 +20,7 @@ public class Admin extends Employee {
 
     public void viewUsers(Database database) {
         List<User> users = database.getUsers();
-        
+
         for (User user : users) {
             System.out.println(user);
         }

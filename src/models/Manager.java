@@ -24,7 +24,7 @@ public class Manager extends Employee {
         registration.approve();
     }
 
-    public void rejectRegistartion(Registration registration) {
+    public void rejectRegistration(Registration registration) {
         registration.reject();
     }
 
