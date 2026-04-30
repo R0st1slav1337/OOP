@@ -1,10 +1,8 @@
 package models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Admin extends Employee {
-    private List<User> users = new ArrayList<>();
 
     public Admin(String id, String username, String password, String fullName, double salary, String department) {
         super(id, username, password, fullName, salary, department);
