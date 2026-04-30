@@ -52,6 +52,34 @@ public class Database {
         return topResearcher;
     }
 
+    public void printTopCitedResearcher() {
+        Researcher topResearcher = getTopCitedResearcher();
+
+        if (topResearcher == null) {
+            System.out.println("No researchers found.");
+            return;
+        }
+
+        User user = (User) topResearcher;
+
+        System.out.println("Top cited researcher:");
+        System.out.println(user.getFullName());
+        System.out.println("Total citations: " + topResearcher.getTotalCitations());
+        System.out.println("H-index: " + topResearcher.getHIndex());
+    }
+
+    public void printAllResearchers() {
+        System.out.println("All researchers:");
+
+        for (User user : users) {
+            if (user instanceof Researcher researcher) {
+                System.out.println(user.getFullName() +
+                        " | h-index: " + researcher.getHIndex() +
+                        " | citations: " + researcher.getTotalCitations());
+            }
+        }
+    }
+
     public List<User> getUsers() {
         return users;
     }

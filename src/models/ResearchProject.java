@@ -19,11 +19,26 @@ public class ResearchProject {
             throw new NotResearcherException("Only researchers can join research project.");
         }
 
-        participants.add((Researcher) user);
+        Researcher researcher = (Researcher) user;
+
+        if (!participants.contains(researcher)) {
+            participants.add(researcher);
+        }
     }
 
     public void addPaper(ResearchPaper paper) {
-        publishedPapers.add(paper);
+        if (!publishedPapers.contains(paper)) {
+            publishedPapers.add(paper);
+        }
+    }
+
+    public void printParticipants() {
+        System.out.println("Participants of project: " + topic);
+
+        for (Researcher researcher : participants) {
+            User user = (User) researcher;
+            System.out.println("- " + user.getFullName() + ", h-index: " + researcher.getHIndex());
+        }
     }
 
     public String getTopic() {

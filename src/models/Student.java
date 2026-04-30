@@ -20,6 +20,7 @@ public class Student extends User implements Researcher {
     private Map<Course, Mark> marks = new HashMap<>();
     private List<Course> courses = new ArrayList<>();
     private List<ResearchPaper> researchPapers = new ArrayList<>();
+    private List<ResearchProject> researchProjects = new ArrayList<>();
     
 
     public Student(String id, String username, String password, String fullName,
@@ -32,10 +33,21 @@ public class Student extends User implements Researcher {
     }
 
     public Registration requestRegistration(Course course) {
-        if (totalCredits + course.getCredits() > 21 ) {
-            System.out.println("Cannot register: credit limit exceeded");
+        if (course == null) {
+            System.out.println("Course does not exist.");
             return null;
         }
+
+        if (courses.contains(course)) {
+            System.out.println("You are already registered for this course.");
+            return null;
+        }
+        
+        if (totalCredits + course.getCredits() > 21 ) {
+            System.out.println("Cannot register: credit limit exceeded.");
+            return null;
+        }
+
         return new Registration(this, course);
     }
 
@@ -55,6 +67,11 @@ public class Student extends User implements Researcher {
     }
 
     public void addMark(Course course, Mark mark) {
+        if (!courses.contains(course)) {
+            System.out.println("Cannot add mark: student is not registered for this course.");
+            return;
+        }
+        
         marks.put(course, mark);
     }
 
@@ -93,6 +110,10 @@ public class Student extends User implements Researcher {
         return hIndex;
     }
 
+    public int getTotalCredits() {
+        return totalCredits;
+    }
+
     public List<Course> getCourses() {
         return courses;
     }
@@ -109,6 +130,18 @@ public class Student extends User implements Researcher {
     @Override
     public void addResearchPaper(ResearchPaper paper) {
         researchPapers.add(paper);
+    }
+
+    @Override
+    public List<ResearchProject> getResearchProjects() {
+        return researchProjects;
+    }
+
+    @Override
+    public void addResearchProject(ResearchProject project) {
+        if (!researchProjects.contains(project)) {
+            researchProjects.add(project);
+        }
     }
 
     @Override

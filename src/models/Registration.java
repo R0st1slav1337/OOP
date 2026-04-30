@@ -15,7 +15,6 @@ public class Registration {
 
     public void approve() {
         this.status = RegistrationStatus.APPROVED;
-        course.addStudent(student);
     }
 
     public void reject() {

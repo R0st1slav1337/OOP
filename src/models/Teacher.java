@@ -10,6 +10,7 @@ public class Teacher extends Employee implements Researcher {
     private List<Course> courses = new ArrayList<>();
     private List<ResearchPaper> researchPapers = new ArrayList<>();
     private int hIndex;
+    private List<ResearchProject> researchProjects = new ArrayList<>();
 
     public Teacher(String id, String username, String password, String fullName, 
                     double salary, String department, TeacherTitle title, int hIndex) {
@@ -24,7 +25,18 @@ public class Teacher extends Employee implements Researcher {
     }
 
     public void putMark(Student student, Course course, Mark mark) {
+        if (!courses.contains(course)) {
+            System.out.println("Cannot put mark: teacher is not assigned to this course.");
+            return;
+        }
+
+        if (!course.getStudents().contains(student)) {
+            System.out.println("Cannot put mark: student is not registered for this course.");
+            return;
+        }
+        
         student.addMark(course, mark);
+        System.out.println("Mark was successfully added for " + student.getFullName());
     }
 
     public void viewCourses() {
@@ -54,6 +66,18 @@ public class Teacher extends Employee implements Researcher {
     @Override
     public void addResearchPaper(ResearchPaper paper) {
         researchPapers.add(paper);
+    }
+
+    @Override
+    public List<ResearchProject> getResearchProjects() {
+        return researchProjects;
+    }
+
+    @Override
+    public void addResearchProject(ResearchProject project) {
+        if (!researchProjects.contains(project)) {
+            researchProjects.add(project);
+        }
     }
 
     @Override
