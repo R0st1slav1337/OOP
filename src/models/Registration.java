@@ -1,8 +1,12 @@
 package models;
 
+import java.io.Serializable;
+
 import enums.RegistrationStatus;
 
-public class Registration {
+public class Registration implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Student student;
     private Course course;
     private RegistrationStatus status;

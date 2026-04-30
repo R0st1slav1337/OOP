@@ -1,11 +1,14 @@
 package models;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ResearchPaper implements Comparable<ResearchPaper> {
+public class ResearchPaper implements Comparable<ResearchPaper>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String title;
     private List<User> authors;
     private String journal;

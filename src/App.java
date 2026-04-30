@@ -8,7 +8,7 @@ import exceptions.NotResearcherException;
 
 public class App {
     public static void main(String[] args) {
-        Database database = new Database();
+        Database database = Database.getInstance();
 
         Student student = new Student(
                 "S1",
@@ -42,6 +42,16 @@ public class App {
                 10
         );
 
+        Admin admin = new Admin(
+                "A1",
+                "admin1",
+                "123",
+                "Main Admin",
+                800000,
+                "IT"
+        );
+
+        database.addUser(admin);
         database.addUser(student);
         database.addUser(teacher);
         database.addUser(manager);
@@ -130,5 +140,31 @@ public class App {
         
         System.out.println();
         database.printTopCitedResearcher();
+
+        System.out.println();
+        System.out.println("=== Authentication test ===");
+
+        User loggedInUser = database.authenticate("student1", "123");
+
+        if (loggedInUser != null) {
+            System.out.println("Logged in as: " + loggedInUser.getFullName());
+            loggedInUser.showMenu();
+        } else {
+            System.out.println("Wrong username or password.");
+        }
+
+        User failedLogin = database.authenticate("student1", "wrongpassword");
+
+        if (failedLogin == null) {
+           System.out.println("Login failed as expected.");
+        }
+
+        System.out.println();
+        System.out.println("=== Logs test ===");
+        admin.viewLogs(database);
+
+
+
+        database.save("university.ser");
     }
 }

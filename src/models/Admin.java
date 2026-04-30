@@ -12,10 +12,12 @@ public class Admin extends Employee {
 
     public void addUser(Database database, User user) {
         database.addUser(user);
+        database.addLog("ADMIN: " + getFullName() + " added user " + user.getFullName());
     }
 
     public void removeUser(Database database, User user) {
         database.removeUser(user);
+        database.addLog("ADMIN: " + getFullName() + " removed user " + user.getFullName());
     }
 
     public void viewUsers(Database database) {
@@ -24,6 +26,10 @@ public class Admin extends Employee {
         for (User user : users) {
             System.out.println(user);
         }
+    }
+
+    public void viewLogs(Database database) {
+        database.printLogs();
     }
 
     @Override

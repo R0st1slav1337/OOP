@@ -27,16 +27,36 @@ public class Teacher extends Employee implements Researcher {
     public void putMark(Student student, Course course, Mark mark) {
         if (!courses.contains(course)) {
             System.out.println("Cannot put mark: teacher is not assigned to this course.");
+            
+            Database.getInstance().addLog(
+                "TEACHER: " + getFullName() +
+                " failed to put mark because he/she is not assigned to course " + course.getName()
+            
+            );
             return;
         }
 
         if (!course.getStudents().contains(student)) {
             System.out.println("Cannot put mark: student is not registered for this course.");
+            
+            Database.getInstance().addLog(
+                "TEACHER: " + getFullName() +
+                " failed to put mark because student " + student.getFullName() +
+                " is not registered for course " + course.getName()
+            
+            );
             return;
         }
         
         student.addMark(course, mark);
         System.out.println("Mark was successfully added for " + student.getFullName());
+        
+        Database.getInstance().addLog(
+            "TEACHER: " + getFullName() +
+            " put mark for student " + student.getFullName() +
+            " in course " + course.getName() +
+            ". Total: " + mark.getTotal()
+        );
     }
 
     public void viewCourses() {
@@ -66,6 +86,10 @@ public class Teacher extends Employee implements Researcher {
     @Override
     public void addResearchPaper(ResearchPaper paper) {
         researchPapers.add(paper);
+        Database.getInstance().addLog(
+            "RESEARCH: " + getFullName() +
+            " added research paper '" + paper.getTitle() + "'"
+        );
     }
 
     @Override
@@ -78,6 +102,11 @@ public class Teacher extends Employee implements Researcher {
         if (!researchProjects.contains(project)) {
             researchProjects.add(project);
         }
+
+        Database.getInstance().addLog(
+            "RESEARCH: " + getFullName() +
+            " joined research project '" + project.getTopic() + "'"
+        );
     }
 
     @Override

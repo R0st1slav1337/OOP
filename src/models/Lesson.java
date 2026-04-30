@@ -1,8 +1,11 @@
 package models;
 
 import enums.LessonType;
+import java.io.Serializable;
 
-public class Lesson {
+public class Lesson implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String topic;
     private LessonType type;
     private Course course;

@@ -3,12 +3,58 @@ package models;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.io.*;
+import java.time.LocalDateTime;
 
-public class Database {
+public class Database implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private static Database instance;
+
     private List<User> users = new ArrayList<>();
     private List<Course> courses = new ArrayList<>();
     private List<ResearchProject> researchProjects = new ArrayList<>();
     private List<ResearchPaper> researchPapers = new ArrayList<>();
+    private List<String> logs = new ArrayList<>();
+
+    private Database() {}
+
+    public static Database getInstance() {
+        if (instance == null) {
+            instance = new Database();
+        }
+
+        return instance;
+    }
+
+    public void addLog(String action) {
+        logs.add(LocalDateTime.now() + " | " + action);
+    }
+
+    public void printLogs() {
+        if (logs.isEmpty()) {
+            System.out.println("No logs yet.");
+            return;
+        }
+
+        System.out.println("System logs:");
+        for (String log : logs) {
+            System.out.println(log);
+        }
+    }
+
+    // authentification for users
+    public User authenticate(String username, String password) {
+        for (User user : users) {
+            if (user.login(username, password)) {
+                addLog("LOGIN SUCCESS: " + user.getFullName() + " logged in.");
+                return user;
+            }
+        }
+
+        addLog("LOGIN FAILED: username = " + username);
+        return null;
+    }
 
     public void addUser(User user) {
         users.add(user);
@@ -96,4 +142,31 @@ public class Database {
         return researchPapers;
     }
     
+    // Save data to database
+    public void save(String fileName) {
+        addLog("DATABASE: database saved to file " + fileName);
+
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
+            out.writeObject(this);
+            System.out.println("Database saved successfully.");
+        } catch (IOException e) {
+            System.out.println("Error while saving database: " + e.getMessage());
+        }
+    }
+
+    // Load data from database
+    public static Database load(String fileName) {
+        instance.addLog("DATABASE: database loaded from file " + fileName);
+        
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
+            instance = (Database) in.readObject();
+            System.out.println("Database loaded successfully.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Could not load database. New database was created.");
+            instance = new Database();
+        }
+
+        return instance;
+    }
+
 }

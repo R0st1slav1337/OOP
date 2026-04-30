@@ -38,6 +38,14 @@ public class Manager extends Employee {
         if (student.getTotalCredits() + course.getCredits() > 21) {
             System.out.println("Cannot approve: credit limit exceeded.");
             registration.reject();
+
+            Database.getInstance().addLog(
+                "MANAGER: " + getFullName() +
+                " rejected registration of " + student.getFullName() +
+                " for course " + course.getName() +
+                " because credit limit was exceeded"
+            );
+
             return;
         }
 
@@ -46,6 +54,12 @@ public class Manager extends Employee {
         course.addStudent(student);
 
         System.out.println("Registration approved: " + registration);
+
+        Database.getInstance().addLog(
+                "MANAGER: " + getFullName() +
+                " approved registration of " + student.getFullName() +
+                " for course " + course.getName()
+        );
     }
 
     public void rejectRegistration(Registration registration) {
@@ -61,10 +75,23 @@ public class Manager extends Employee {
 
         registration.reject();
         System.out.println("Registration rejected: " + registration);
+
+        Database.getInstance().addLog(
+                "MANAGER: " + getFullName() +
+                " rejected registration of " + registration.getStudent().getFullName() +
+                " for course " + registration.getCourse().getName()
+        );
+
     }
 
     public void assignTeacher(Course course, Teacher teacher) {
         teacher.assignCourse(course);
+
+        Database.getInstance().addLog(
+            "MANAGER: " + getFullName() +
+            " assigned teacher " + teacher.getFullName() +
+            " to course " + course.getName()
+        );
     }
 
     public void viewStudentsSortedByGpa(List<Student> students) {

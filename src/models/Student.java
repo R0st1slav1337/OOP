@@ -45,8 +45,19 @@ public class Student extends User implements Researcher {
         
         if (totalCredits + course.getCredits() > 21 ) {
             System.out.println("Cannot register: credit limit exceeded.");
+            Database.getInstance().addLog(
+                "STUDENT: " + getFullName() +
+                " failed to request registration for course " + course.getName() +
+                " because credit limit was exceeded"
+            );
+
             return null;
         }
+
+        Database.getInstance().addLog(
+            "STUDENT: " + getFullName() +
+            " requested registration for course " + course.getName()
+        );
 
         return new Registration(this, course);
     }
@@ -130,6 +141,10 @@ public class Student extends User implements Researcher {
     @Override
     public void addResearchPaper(ResearchPaper paper) {
         researchPapers.add(paper);
+        Database.getInstance().addLog(
+            "RESEARCH: " + getFullName() +
+            " added research paper '" + paper.getTitle() + "'"
+        );
     }
 
     @Override
@@ -142,6 +157,11 @@ public class Student extends User implements Researcher {
         if (!researchProjects.contains(project)) {
             researchProjects.add(project);
         }
+        
+        Database.getInstance().addLog(
+            "RESEARCH: " + getFullName() +
+            " joined research project '" + project.getTopic() + "'"
+        );
     }
 
     @Override
