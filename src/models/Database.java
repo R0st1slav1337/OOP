@@ -156,14 +156,14 @@ public class Database implements Serializable {
 
     // Load data from database
     public static Database load(String fileName) {
-        instance.addLog("DATABASE: database loaded from file " + fileName);
-        
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
             instance = (Database) in.readObject();
+            instance.addLog("DATABASE: database loaded from file " + fileName);
             System.out.println("Database loaded successfully.");
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Could not load database. New database was created.");
             instance = new Database();
+            instance.addLog("DATABASE: new database was created because loading failed.");
         }
 
         return instance;
