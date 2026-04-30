@@ -173,6 +173,15 @@ public class App {
         }
 
         System.out.println();
+        System.out.println("=== Report strategy test ===");
+
+        manager.generateReport(new OverallPerformanceReport());
+
+        System.out.println();
+
+        manager.generateReport(new CoursePerformanceReport(oop));
+
+        System.out.println();
         System.out.println("=== Logs test ===");
         admin.viewLogs(database);
 

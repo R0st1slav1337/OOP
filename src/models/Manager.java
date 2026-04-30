@@ -94,6 +94,19 @@ public class Manager extends Employee {
         );
     }
 
+    public void generateReport(ReportStrategy strategy) {
+        if (strategy == null) {
+            System.out.println("Report strategy does not exist.");
+            return;
+        }
+
+        strategy.generate(Database.getInstance());
+
+        Database.getInstance().addLog(
+                "MANAGER: " + getFullName() + " generated report: " + strategy.getName()
+        );
+    }
+
     public void viewStudentsSortedByGpa(List<Student> students) {
         students.stream().sorted(Comparator.comparing(Student::getGpa).reversed())
         .forEach(System.out::println);

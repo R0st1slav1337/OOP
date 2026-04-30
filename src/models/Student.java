@@ -11,7 +11,6 @@ import java.util.Comparator;
 
 public class Student extends User implements Researcher {
     private int year;
-    private String major;
     private double gpa;
     private int totalCredits;
     private int hIndex;
@@ -27,7 +26,6 @@ public class Student extends User implements Researcher {
                    int year, String major, double gpa, int hIndex) {
         super(id, username, password, fullName);
         this.year = year;
-        this.major = major;
         this.gpa = gpa;
         this.hIndex = hIndex;
     }
@@ -131,6 +129,28 @@ public class Student extends User implements Researcher {
 
     public Map<Course, Mark> getMarks() {
         return marks;
+    }
+
+    public double calculateGpa() {
+        if (marks.isEmpty()) {
+            return 0.0;
+        }
+
+        double totalPoints = 0;
+        int totalCredits = 0;
+
+        for (Course course : marks.keySet()) {
+            Mark mark = marks.get(course);
+
+            totalPoints += mark.getGpaPoints() * course.getCredits();
+            totalCredits += course.getCredits();
+        }
+
+        if (totalCredits == 0) {
+            return 0.0;
+        }
+
+        return totalPoints / totalCredits;
     }
 
     @Override
