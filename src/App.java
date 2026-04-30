@@ -1,5 +1,6 @@
 import enums.ManagerType;
 import enums.TeacherTitle;
+import enums.UserType;
 import models.*;
 
 import java.time.LocalDate;
@@ -20,6 +21,18 @@ public class App {
                 3.5,
                 0
         );
+
+        User factoryStudent = UserFactory.createUser(
+            UserType.STUDENT,
+            "S2",
+            "student2",
+            "123",
+            "Factory Student"
+        );
+
+        database.addUser(factoryStudent);
+        System.out.println("Factory test:");
+        System.out.println(factoryStudent);
 
         Manager manager = new Manager(
                 "M1",
