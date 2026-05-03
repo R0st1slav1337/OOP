@@ -216,6 +216,19 @@ public class App {
         }
 
         System.out.println();
+        System.out.println("=== Teacher rating test ===");
+
+        student.rateTeacher( teacher, oop, 5,
+                "Explains OOP clearly and gives useful examples."
+        );
+        
+        student.rateTeacher(teacher, oop, 4,
+                "Second rating attempt."
+        );
+
+        teacher.printRatings();
+
+        System.out.println();
         System.out.println("=== Report strategy test ===");
 
         manager.generateReport(new OverallPerformanceReport());

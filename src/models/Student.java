@@ -180,6 +180,66 @@ public class Student extends User implements Researcher {
         return count;
     }
 
+    public void rateTeacher(Teacher teacher, Course course, int ratingValue, String comment) {
+        if (teacher == null) {
+            System.out.println("Teacher does not exist.");
+            return;
+        }
+
+        if (course == null) {
+            System.out.println("Course does not exist.");
+            return;
+        }
+
+        if (!courses.contains(course)) {
+            System.out.println("Cannot rate teacher: student is not registered for this course.");
+
+            Database.getInstance().addLog(
+                    "STUDENT: " + getFullName() +
+                            " failed to rate teacher " + teacher.getFullName() +
+                            " because student is not registered for course " + course.getName()
+            );
+
+            return;
+        }
+
+        if (!course.getInstructors().contains(teacher)) {
+            System.out.println("Cannot rate teacher: this teacher does not teach this course.");
+
+            Database.getInstance().addLog(
+                    "STUDENT: " + getFullName() +
+                            " failed to rate teacher " + teacher.getFullName() +
+                            " because teacher does not teach course " + course.getName()
+            );
+
+            return;
+        }
+
+        if (teacher.hasRatingFrom(this, course)) {
+            System.out.println("You have already rated this teacher for this course.");
+
+         Database.getInstance().addLog(
+                    "STUDENT: " + getFullName() +
+                            " failed to rate teacher " + teacher.getFullName() +
+                            " because rating already exists for course " + course.getName()
+            );
+
+            return;
+        }
+
+        TeacherRating rating = new TeacherRating(this, teacher, course, ratingValue, comment);
+        teacher.addRating(rating);
+
+        Database.getInstance().addLog(
+                "STUDENT: " + getFullName() +
+                        " rated teacher " + teacher.getFullName() +
+                        " for course " + course.getName() +
+                        ". Rating: " + ratingValue + "/5"
+        );
+
+        System.out.println("Teacher was rated successfully.");
+    }
+
     public int getYear() {
         return year;
     }

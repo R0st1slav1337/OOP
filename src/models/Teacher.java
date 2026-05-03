@@ -11,6 +11,7 @@ public class Teacher extends Employee implements Researcher {
     private List<ResearchPaper> researchPapers = new ArrayList<>();
     private int hIndex;
     private List<ResearchProject> researchProjects = new ArrayList<>();
+    private List<TeacherRating> ratings = new ArrayList<>();
 
     public Teacher(String id, String username, String password, String fullName, 
                     double salary, String department, TeacherTitle title, int hIndex) {
@@ -63,6 +64,64 @@ public class Teacher extends Employee implements Researcher {
         for (Course course : courses) {
             System.out.println(course);
         }
+    }
+
+    public void addRating(TeacherRating rating) {
+        if (ratings == null) {
+            ratings = new ArrayList<>();
+        }
+
+        if (!hasRatingFrom(rating.getStudent(), rating.getCourse())) {
+            ratings.add(rating);
+        }
+    }
+
+    public boolean hasRatingFrom(Student student, Course course) {
+        if (ratings == null) {
+            ratings = new ArrayList<>();
+        }
+
+        for (TeacherRating rating : ratings) {
+            if (rating.getStudent().equals(student) && rating.getCourse().equals(course)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public double getAverageRating() {
+        if (ratings == null || ratings.isEmpty()) {
+            return 0.0;
+        }
+
+        double sum = 0;
+
+        for (TeacherRating rating : ratings) {
+            sum += rating.getRating();
+        }
+
+        return sum / ratings.size();
+    }
+
+    public void printRatings() {
+        if (ratings == null || ratings.isEmpty()) {
+            System.out.println("No ratings for teacher " + getFullName());
+            return;
+        }
+
+        System.out.println("Ratings for teacher " + getFullName() + ":");
+        System.out.println("--------------------------------");
+
+        for (TeacherRating rating : ratings) {
+            System.out.println(rating);
+        }
+
+        System.out.printf("Average rating: %.2f/5%n", getAverageRating());
+    }
+
+    public List<TeacherRating> getRatings() {
+        return ratings;
     }
 
     public TeacherTitle getTitle() {
