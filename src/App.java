@@ -229,6 +229,35 @@ public class App {
         teacher.printRatings();
 
         System.out.println();
+        System.out.println("=== Employee messages test ===");
+
+        teacher.sendMessage(manager,
+            "Hello, I need approval for additional practice lessons."
+        );
+
+        manager.viewInbox();
+
+        System.out.println();
+
+        teacher.viewSentMessages();
+
+        System.out.println();
+        System.out.println("=== Employee complaint test ===");
+
+        teacher.sendComplaint(admin, "Room equipment issue",
+        "Projector in room 302 does not work properly."
+        );
+
+        admin.viewReceivedComplaints();
+
+        Complaint complaint = admin.getReceivedComplaints().get(0);
+        admin.resolveComplaint(complaint);
+
+        System.out.println();
+
+        admin.viewReceivedComplaints();
+
+        System.out.println();
         System.out.println("=== Report strategy test ===");
 
         manager.generateReport(new OverallPerformanceReport());
