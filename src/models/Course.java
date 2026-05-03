@@ -41,8 +41,18 @@ public class Course implements Serializable {
     }
 
     public void addStudent(Student student) {
+        if (students == null) {
+            students = new ArrayList<>();
+        }
+
         if (!students.contains(student)) {
             students.add(student);
+
+            if (lessons != null) {
+                for (Lesson lesson : lessons) {
+                    lesson.addStudent(student);
+                }
+            }
         }
     }
 
@@ -63,7 +73,32 @@ public class Course implements Serializable {
     }
 
     public void addLesson(Lesson lesson) {
-        lessons.add(lesson);
+        if (lessons == null) {
+            lessons = new ArrayList<>();
+        }
+
+        if (lesson == null) {
+            System.out.println("Lesson does not exist.");
+            return;
+        }
+
+        if (!lessons.contains(lesson)) {
+            lessons.add(lesson);
+        }
+    }
+
+    public void printSchedule() {
+        if (lessons == null || lessons.isEmpty()) {
+            System.out.println("No lessons for course " + name);
+            return;
+        }
+
+        System.out.println("Schedule for course: " + name);
+        System.out.println("--------------------------------");
+
+        for (Lesson lesson : lessons) {
+            System.out.println(lesson);
+        }
     }
 
     public int getCredits() {

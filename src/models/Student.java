@@ -32,6 +32,9 @@ public class Student extends User implements Researcher {
         this.hIndex = hIndex;
     }
 
+    // This method allows the student to request registration for a course. It checks if the course exists, 
+    // if the student is already registered, if the credit limit is exceeded, if the course is intended for the student's major/year, 
+    // and if the student has failed 3 or more courses. If all checks pass, it creates a new Registration object and returns it.
     public Registration requestRegistration(Course course) {
         if (course == null) {
             Database.getInstance().addLog(
@@ -101,6 +104,8 @@ public class Student extends User implements Researcher {
         return supervisor;
     }
 
+    // This method allows the student to set a research supervisor, but only if they are a 4th year student and the 
+    // supervisor has an h-index of at least 3
     public void setSupervisor(Researcher supervisor) throws LowHIndexException {
         if (!needsSupervisor()) {
             System.out.println("Only 4th year students need a research supervisor.");
@@ -158,6 +163,7 @@ public class Student extends User implements Researcher {
         }
     }
 
+    // This method allows the student to view their transcript, which includes all courses and marks
     public Transcript getTranscript() {
         Transcript transcript = new Transcript(this);
 
@@ -168,6 +174,7 @@ public class Student extends User implements Researcher {
         return transcript;
     }
 
+    // Get the number of failed courses (courses with marks below 50)
     public int getFailedCoursesCount() {
         int count = 0;
 
@@ -180,6 +187,7 @@ public class Student extends User implements Researcher {
         return count;
     }
 
+    // This method allows the students to rate their teachers for the courses they are registered in
     public void rateTeacher(Teacher teacher, Course course, int ratingValue, String comment) {
         if (teacher == null) {
             System.out.println("Teacher does not exist.");
@@ -203,6 +211,7 @@ public class Student extends User implements Researcher {
             return;
         }
 
+        // Check if the teacher teaches this course
         if (!course.getInstructors().contains(teacher)) {
             System.out.println("Cannot rate teacher: this teacher does not teach this course.");
 
@@ -215,6 +224,7 @@ public class Student extends User implements Researcher {
             return;
         }
 
+        // Check if the student has already rated this teacher for this course
         if (teacher.hasRatingFrom(this, course)) {
             System.out.println("You have already rated this teacher for this course.");
 
@@ -238,6 +248,42 @@ public class Student extends User implements Researcher {
         );
 
         System.out.println("Teacher was rated successfully.");
+    }
+
+    // This method allows the student to view the schedule of all lessons for the courses they are registered in
+    public void viewSchedule() {
+        System.out.println("Schedule of student " + getFullName() + ":");
+        System.out.println("--------------------------------");
+
+        boolean hasLessons = false;
+
+        for (Course course : courses) {
+            for (Lesson lesson : course.getLessons()) {
+                if (lesson.getStudents().contains(this)) {
+                    System.out.println(lesson);
+                    hasLessons = true;
+                }
+            }
+        }
+
+        if (!hasLessons) {
+            System.out.println("No lessons found.");
+        }
+    }
+
+    // This method allows the student to view the schedule of a specific course they are registered in
+    public void viewLessonsForCourse(Course course) {
+        if (course == null) {
+            System.out.println("Course does not exist.");
+            return;
+        }
+
+        if (!courses.contains(course)) {
+            System.out.println("Student is not registered for this course.");
+            return;
+        }
+
+        course.printSchedule();
     }
 
     public int getYear() {
@@ -269,6 +315,7 @@ public class Student extends User implements Researcher {
         return marks;
     }
 
+    // GPA is calculated as the weighted average of the grade points, where the weights are the course credits
     public double calculateGpa() {
         if (marks.isEmpty()) {
             return 0.0;

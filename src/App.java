@@ -1,8 +1,7 @@
-import enums.ManagerType;
-import enums.TeacherTitle;
-import enums.UserType;
+import enums.*;
 import models.*;
 
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -141,6 +140,45 @@ public class App {
         System.out.println();
         Transcript transcript = student.getTranscript();
         transcript.printTranscript();
+
+        System.out.println();
+        System.out.println("=== Lesson test ===");
+
+        Lesson lesson1 = teacher.createLesson(oop, "Introduction to Classes and Objects",
+        LessonType.LECTURE, LocalDateTime.of(2026, 5, 1, 10, 0),
+        "Room 301"
+        );
+
+        Lesson lesson2 = teacher.createLesson(oop, "Practice: Creating Java Classes",
+        LessonType.PRACTICE, LocalDateTime.of(2026, 5, 3, 12, 0),
+        "Room 302"
+        );
+
+        System.out.println();
+
+        oop.printSchedule();
+
+        System.out.println();
+
+        teacher.viewSchedule();
+
+        System.out.println();
+
+        student.viewSchedule();
+
+        System.out.println();
+
+        if (lesson1 != null) {
+            lesson1.printLessonInfo();
+
+            System.out.println();
+
+            teacher.markAttendance(lesson1, student, true);
+
+            System.out.println();
+
+            lesson1.printAttendance();
+        }
 
         System.out.println();
         System.out.println("=== Research test ===");

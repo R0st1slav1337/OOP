@@ -2,8 +2,10 @@ package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 
 import enums.TeacherTitle;
+import enums.LessonType;
 
 public class Teacher extends Employee implements Researcher {
     private TeacherTitle title;
@@ -122,6 +124,114 @@ public class Teacher extends Employee implements Researcher {
 
     public List<TeacherRating> getRatings() {
         return ratings;
+    }
+
+    private boolean hasLessonAt(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return false;
+        }
+
+        for (Course course : courses) {
+            for (Lesson lesson : course.getLessons()) {
+                if (dateTime.equals(lesson.getDateTime())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public Lesson createLesson(Course course, String topic, LessonType type, LocalDateTime dateTime, String room) {
+        if (course == null) {
+            System.out.println("Course does not exist.");
+            return null;
+        }
+
+        if (!courses.contains(course)) {
+            System.out.println("Cannot create lesson: teacher is not assigned to this course.");
+
+            Database.getInstance().addLog(
+                    "TEACHER: " + getFullName() +
+                            " failed to create lesson because teacher is not assigned to course " +
+                            course.getName()
+            );
+
+            return null;
+        }
+
+        if (hasLessonAt(dateTime)) {
+            System.out.println("Cannot create lesson: teacher already has a lesson at this time.");
+
+            Database.getInstance().addLog(
+                    "TEACHER: " + getFullName() +
+                            " failed to create lesson because of schedule conflict at " + dateTime
+            );
+
+            return null;
+        }
+
+        Lesson lesson = new Lesson(topic, type, course, this, dateTime, room);
+        course.addLesson(lesson);
+
+        Database.getInstance().addLog(
+                "TEACHER: " + getFullName() +
+                        " created " + type +
+                        " lesson for course " + course.getName() +
+                        ". Topic: " + topic
+        );
+
+        System.out.println("Lesson created successfully.");
+
+        return lesson;
+    }
+
+    public void markAttendance(Lesson lesson, Student student, boolean present) {
+        if (lesson == null) {
+            System.out.println("Lesson does not exist.");
+            return;
+        }
+
+        if (lesson.getInstructor() != this) {
+            System.out.println("Cannot mark attendance: this teacher is not instructor of this lesson.");
+
+            Database.getInstance().addLog(
+                    "TEACHER: " + getFullName() +
+                            " failed to mark attendance because teacher is not instructor of lesson " +
+                            lesson.getTopic()
+            );
+
+            return;
+        }
+
+        lesson.markAttendance(student, present);
+
+        Database.getInstance().addLog(
+                "TEACHER: " + getFullName() +
+                        " marked attendance for student " + student.getFullName() +
+                        " in lesson " + lesson.getTopic() +
+                        ": " + (present ? "Present" : "Absent")
+        );
+    }
+
+    public void viewSchedule() {
+        System.out.println("Schedule of teacher " + getFullName() + ":");
+        System.out.println("--------------------------------");
+
+        boolean hasLessons = false;
+
+        for (Course course : courses) {
+            for (Lesson lesson : course.getLessons()) {
+                if (lesson.getInstructor() == this) {
+                    System.out.println(lesson);
+                    hasLessons = true;
+                }
+            }
+        }
+
+        if (!hasLessons) {
+            System.out.println("No lessons found.");
+        }
     }
 
     public TeacherTitle getTitle() {
