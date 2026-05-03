@@ -436,7 +436,10 @@ public class App {
 
         database.printTopCitedResearcherBySchoolAndYear("Computer Science", 2023);
 
+        System.out.println();
+        System.out.println("=== Database cleanup/search test ===");
 
+        database.printDatabaseSummary();
 
         database.save("university.ser");
     }

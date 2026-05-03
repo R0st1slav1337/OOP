@@ -31,19 +31,51 @@ public class Database implements Serializable {
         return instance;
     }
 
+    // Ensure all lists are initialized (for backward compatibility)
+    private void ensureStorage() {
+        if (users == null) {
+            users = new ArrayList<>();
+        }
+
+        if (courses == null) {
+            courses = new ArrayList<>();
+        }
+
+        if (researchProjects == null) {
+            researchProjects = new ArrayList<>();
+        }
+
+        if (researchPapers == null) {
+            researchPapers = new ArrayList<>();
+        }
+
+        if (logs == null) {
+            logs = new ArrayList<>();
+        }
+
+        if (newsList == null) {
+            newsList = new ArrayList<>();
+        }
+    }
+
     // add log
     public void addLog(String action) {
+        ensureStorage();
         logs.add(LocalDateTime.now() + " | " + action);
     }
 
     // get all logs 
     public void printLogs() {
+        ensureStorage();
+
         if (logs.isEmpty()) {
             System.out.println("No logs yet.");
             return;
         }
 
         System.out.println("System logs:");
+        System.out.println("----------------------------------");
+
         for (String log : logs) {
             System.out.println(log);
         }
@@ -63,14 +95,42 @@ public class Database implements Serializable {
     }
 
     public void addUser(User user) {
+        ensureStorage();
+
+        if (user == null) {
+            System.out.println("User does not exist.");
+            return;
+        }
+
+        if (findUserByUsername(user.getUsername()) != null) {
+            System.out.println("User with this username already exists.");
+            addLog("DATABASE: failed to add user because username already exists: " + user.getUsername());
+            return;
+        }
+
         users.add(user);
+
+        addLog("DATABASE: added user " + user.getFullName() + " (" + user.getUsername() + ")");
     }
 
     public void removeUser(User user) {
-        users.remove(user);
+        ensureStorage();
+
+        if (user == null) {
+            System.out.println("User does not exist.");
+            return;
+        }
+
+        if (users.remove(user)) {
+            addLog("DATABASE: removed user " + user.getFullName() + " (" + user.getUsername() + ")");
+        } else {
+            System.out.println("User was not found in database.");
+        }
     }
 
     public User findUserByUsername(String username) {
+        ensureStorage();
+        
         if (username == null || username.isBlank()) {
             return null;
         }
@@ -89,15 +149,108 @@ public class Database implements Serializable {
     }
 
     public void addCourse(Course course) {
+        ensureStorage();
+
+        if (course == null) {
+            System.out.println("Course does not exist.");
+            return;
+        }
+
+        if (findCourseByCode(course.getCode()) != null) {
+            System.out.println("Course with this code already exists.");
+            addLog("DATABASE: failed to add course because code already exists: " + course.getCode());
+            return;
+        }
+
         courses.add(course);
+
+        addLog("DATABASE: added course " + course.getCode() + " - " + course.getName());
+    }
+
+    public Course findCourseByCode(String code) {
+        ensureStorage();
+
+        if (code == null || code.isBlank()) {
+            return null;
+        }
+
+        for (Course course : courses) {
+            if (course.getCode().equalsIgnoreCase(code)) {
+                return course;
+            }
+        }
+
+        return null;
     }
 
     public void addResearchProject(ResearchProject project) {
+        ensureStorage();
+
+        if (project == null) {
+            System.out.println("Research project does not exist.");
+            return;
+        }
+
+        if (findResearchProjectByTopic(project.getTopic()) != null) {
+            System.out.println("Research project with this topic already exists.");
+            addLog("DATABASE: failed to add research project because topic already exists: " + project.getTopic());
+            return;
+        }
+
         researchProjects.add(project);
+
+        addLog("DATABASE: added research project '" + project.getTopic() + "'");
+    }
+
+    public ResearchProject findResearchProjectByTopic(String topic) {
+        ensureStorage();
+
+        if (topic == null || topic.isBlank()) {
+            return null;
+        }
+
+        for (ResearchProject project : researchProjects) {
+            if (project.getTopic().equalsIgnoreCase(topic)) {
+                return project;
+            }
+        }
+
+        return null;
     }
 
     public void addResearchPaper(ResearchPaper paper) {
+        ensureStorage();
+
+        if (paper == null) {
+            System.out.println("Research paper does not exist.");
+            return;
+        }
+
+        if (findResearchPaperByDoi(paper.getDoi()) != null) {
+            System.out.println("Research paper with this DOI already exists.");
+            addLog("DATABASE: failed to add research paper because DOI already exists: " + paper.getDoi());
+            return;
+        }
+
         researchPapers.add(paper);
+
+        addLog("DATABASE: added research paper '" + paper.getTitle() + "'");
+    }
+
+    public ResearchPaper findResearchPaperByDoi(String doi) {
+        ensureStorage();
+
+        if (doi == null || doi.isBlank()) {
+            return null;
+        }
+
+        for (ResearchPaper paper : researchPapers) {
+            if (paper.getDoi().equalsIgnoreCase(doi)) {
+                return paper;
+            }
+        }
+
+        return null;
     }
 
     public void printAllResearchPapers(Comparator<ResearchPaper> comparator) {
@@ -297,6 +450,7 @@ public class Database implements Serializable {
     }
 
     public List<News> getNewsList() {
+        ensureStorage();
         return newsList;
     }
 
@@ -395,19 +549,36 @@ public class Database implements Serializable {
     }
 
     public List<User> getUsers() {
+        ensureStorage();
         return users;
     }
 
     public List<Course> getCourses() {
+        ensureStorage();
         return courses;
     }
 
     public List<ResearchProject> getResearchProjects() {
+        ensureStorage();
         return researchProjects;
     }
 
     public List<ResearchPaper> getResearchPapers() {
+        ensureStorage();
         return researchPapers;
+    }
+
+    public void printDatabaseSummary() {
+        ensureStorage();
+
+        System.out.println("=== Database Summary ===");
+        System.out.println("Users: " + users.size());
+        System.out.println("Courses: " + courses.size());
+        System.out.println("Research papers: " + researchPapers.size());
+        System.out.println("Research projects: " + researchProjects.size());
+        System.out.println("News: " + newsList.size());
+        System.out.println("Employee requests: " + employeeRequests.size());
+        System.out.println("Logs: " + logs.size());
     }
     
     // Save data to database
