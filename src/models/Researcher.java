@@ -45,4 +45,10 @@ public interface Researcher {
 
         return hIndex;
     }
+
+    default int getCitationsByYear(int year) {
+        return getResearchPapers().stream()
+                .filter(paper -> paper.getPublicationDate().getYear() == year)
+                .mapToInt(ResearchPaper::getCitations).sum();
+    }
 }

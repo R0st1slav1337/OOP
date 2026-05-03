@@ -20,6 +20,7 @@ public class Database implements Serializable {
 
     private Database() {}
 
+    // create database
     public static Database getInstance() {
         if (instance == null) {
             instance = new Database();
@@ -28,10 +29,12 @@ public class Database implements Serializable {
         return instance;
     }
 
+    // add log
     public void addLog(String action) {
         logs.add(LocalDateTime.now() + " | " + action);
     }
 
+    // get all logs 
     public void printLogs() {
         if (logs.isEmpty()) {
             System.out.println("No logs yet.");
@@ -81,6 +84,139 @@ public class Database implements Serializable {
         researchPapers.stream().sorted(comparator).forEach(System.out::println);
     }
 
+    // get researcher's school (major/department)
+    private String getResearcherSchool(User user) {
+        if (user instanceof Student) {
+            return ((Student) user).getMajor();
+        }
+
+        if (user instanceof Employee) {
+            return ((Employee) user).getDepartment();
+        }
+
+        return "Unknown";
+    }
+
+    // Get top cited researcher by it's school (major/department)
+    public Researcher getTopCitedResearcherBySchool(String school) {
+        Researcher topResearcher = null;
+        int maxCitations = -1;
+
+        for (User user : users) {
+            if (user instanceof Researcher) {
+                String researcherSchool = getResearcherSchool(user);
+
+                if (researcherSchool != null && researcherSchool.equalsIgnoreCase(school)) {
+                    Researcher researcher = (Researcher) user;
+                    int citations = researcher.getTotalCitations();
+
+                    if (citations > maxCitations) {
+                        maxCitations = citations;
+                        topResearcher = researcher;
+                    }
+                }
+            }
+        }
+
+        return topResearcher;
+    }
+
+    // Print top cited researcher by it's school (major/department)
+    public void printTopCitedResearcherBySchool(String school) {
+        Researcher researcher = getTopCitedResearcherBySchool(school);
+
+        if (researcher == null) {
+            System.out.println("No researchers found for school/department: " + school);
+            return;
+        }
+
+        User user = (User) researcher;
+
+        System.out.println("Top cited researcher of " + school + ":");
+        System.out.println(user.getFullName());
+        System.out.println("Total citations: " + researcher.getTotalCitations());
+        System.out.println("H-index: " + researcher.getHIndex());
+    }
+
+    // Get top cited researcher by year
+    public Researcher getTopCitedResearcherByYear(int year) {
+        Researcher topResearcher = null;
+        int maxCitations = -1;
+
+        for (User user : users) {
+            if (user instanceof Researcher) {
+                Researcher researcher = (Researcher) user;
+                int citations = researcher.getCitationsByYear(year);
+
+                if (citations > maxCitations) {
+                    maxCitations = citations;
+                    topResearcher = researcher;
+                }
+            }
+        }
+
+        return topResearcher;
+    }
+
+    // Print top cited researcher by year
+    public void printTopCitedResearcherByYear(int year) {
+        Researcher researcher = getTopCitedResearcherByYear(year);
+
+        if (researcher == null || researcher.getCitationsByYear(year) == 0) {
+            System.out.println("No cited researchers found for year: " + year);
+            return;
+        }
+
+        User user = (User) researcher;
+
+        System.out.println("Top cited researcher of year " + year + ":");
+        System.out.println(user.getFullName());
+        System.out.println("Citations in " + year + ": " + researcher.getCitationsByYear(year));
+        System.out.println("H-index: " + researcher.getHIndex());
+    }
+
+    // Get top cited researcher by year + school
+    public Researcher getTopCitedResearcherBySchoolAndYear(String school, int year) {
+        Researcher topResearcher = null;
+        int maxCitations = -1;
+
+        for (User user : users) {
+            if (user instanceof Researcher) {
+                String researcherSchool = getResearcherSchool(user);
+
+                if (researcherSchool != null && researcherSchool.equalsIgnoreCase(school)) {
+                    Researcher researcher = (Researcher) user;
+                    int citations = researcher.getCitationsByYear(year);
+
+                    if (citations > maxCitations) {
+                        maxCitations = citations;
+                        topResearcher = researcher;
+                    }
+                }
+            }
+        }
+
+        return topResearcher;
+    }
+
+    // Print top cited researcher by year + school
+    public void printTopCitedResearcherBySchoolAndYear(String school, int year) {
+        Researcher researcher = getTopCitedResearcherBySchoolAndYear(school, year);
+
+        if (researcher == null || researcher.getCitationsByYear(year) == 0) {
+            System.out.println("No cited researchers found for " + school + " in " + year);
+            return;
+        }
+
+        User user = (User) researcher;
+
+        System.out.println("Top cited researcher of " + school + " in " + year + ":");
+        System.out.println(user.getFullName());
+        System.out.println("Citations in " + year + ": " + researcher.getCitationsByYear(year));
+        System.out.println("H-index: " + researcher.getHIndex());
+    }
+
+    // get top cited researcher of all time
     public Researcher getTopCitedResearcher() {
         Researcher topResearcher = null;
         int maxCitations = -1;
@@ -99,6 +235,7 @@ public class Database implements Serializable {
         return topResearcher;
     }
 
+    // print top cited researcher of all time 
     public void printTopCitedResearcher() {
         Researcher topResearcher = getTopCitedResearcher();
 
@@ -115,6 +252,7 @@ public class Database implements Serializable {
         System.out.println("H-index: " + topResearcher.getHIndex());
     }
 
+    // print all researches
     public void printAllResearchers() {
         System.out.println("All researchers:");
 
@@ -127,6 +265,7 @@ public class Database implements Serializable {
         }
     }
 
+    // to publish news
     public void publishNews(News news) {
         newsList.add(news);
 
@@ -141,6 +280,7 @@ public class Database implements Serializable {
         return newsList;
     }
 
+    // Print all news 
     public void printAllNews() {
         if (newsList.isEmpty()) {
             System.out.println("No news published yet.");

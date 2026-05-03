@@ -5,6 +5,8 @@ import models.*;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import exceptions.LowHIndexException;
 import exceptions.NotResearcherException;
 
 public class App {
@@ -50,7 +52,7 @@ public class App {
                 "123",
                 "Alan Teacher",
                 700000,
-                "CS",
+                "Computer Science",
                 TeacherTitle.PROFESSOR,
                 10
         );
@@ -242,6 +244,66 @@ public class App {
 
         System.out.println();
         database.printAllNews();
+
+
+        System.out.println();
+        System.out.println("=== Supervisor test ===");
+
+        Student fourthYearStudent = new Student(
+                "S4",
+                "student4",
+                "123",
+                "Fourth Year Student",
+                4,
+                "Computer Science",
+                3.2,
+                0
+        );
+
+        database.addUser(fourthYearStudent);
+
+        try {
+            fourthYearStudent.setSupervisor(teacher);
+        } catch (LowHIndexException e) {
+            System.out.println(e.getMessage());
+        }
+
+        Teacher weakTeacher = new Teacher(
+                "T3",
+                "teacher3",
+                "123",
+                "Weak Teacher",
+                500000,
+                "Computer Science",
+                TeacherTitle.TUTOR,
+                1
+        );
+
+        database.addUser(weakTeacher);
+
+        try {
+            fourthYearStudent.setSupervisor(weakTeacher);
+        } catch (LowHIndexException e) {
+            System.out.println("Expected exception: " + e.getMessage());
+        }
+
+        System.out.println();
+        System.out.println("=== Top cited researcher tests ===");
+
+        database.printTopCitedResearcher();
+
+        System.out.println();
+
+        database.printTopCitedResearcherBySchool("Computer Science");
+
+        System.out.println();
+
+        database.printTopCitedResearcherByYear(2023);
+
+        System.out.println();
+
+        database.printTopCitedResearcherBySchoolAndYear("Computer Science", 2023);
+
 
 
         database.save("university.ser");

@@ -93,12 +93,48 @@ public class Student extends User implements Researcher {
         }
     }
 
+    public boolean needsSupervisor() {
+        return year == 4;
+    }
+
+    public Researcher getSupervisor() {
+        return supervisor;
+    }
+
     public void setSupervisor(Researcher supervisor) throws LowHIndexException {
-        if (year == 4 && supervisor.getHIndex() < 3) {
+        if (!needsSupervisor()) {
+            System.out.println("Only 4th year students need a research supervisor.");
+            Database.getInstance().addLog(
+                 "STUDENT: " + getFullName() +
+                            " tried to assign supervisor, but student is not 4th year."
+            );
+            return;
+        }
+
+        if (supervisor == null) {
+            System.out.println("Supervisor does not exist.");
+            return;
+        }
+
+        if (supervisor.getHIndex() < 3) {
+            Database.getInstance().addLog(
+                    "STUDENT: " + getFullName() +
+                            " failed to assign supervisor because supervisor h-index is lower than 3."
+            );
+
             throw new LowHIndexException("Supervisor h-index must be at least 3.");
         }
 
         this.supervisor = supervisor;
+
+        User supervisorUser = (User) supervisor;
+
+        Database.getInstance().addLog(
+                "STUDENT: " + getFullName() +
+                        " assigned research supervisor " + supervisorUser.getFullName()
+        );
+
+        System.out.println("Supervisor assigned successfully: " + supervisorUser.getFullName());
     }
 
     public void addMark(Course course, Mark mark) {
