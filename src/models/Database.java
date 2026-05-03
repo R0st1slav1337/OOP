@@ -68,6 +68,24 @@ public class Database implements Serializable {
         users.remove(user);
     }
 
+    public User findUserByUsername(String username) {
+        if (username == null || username.isBlank()) {
+            return null;
+        }
+
+        for (User user : users) {
+            if (user.getUsername().equalsIgnoreCase(username)) {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean isUsernameTaken(String username) {
+        return findUserByUsername(username) != null;
+    }
+
     public void addCourse(Course course) {
         courses.add(course);
     }

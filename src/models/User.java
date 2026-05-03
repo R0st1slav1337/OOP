@@ -32,19 +32,38 @@ public abstract class User implements Serializable, NewsObserver {
         return id;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
     public void setUsername(String username) {
+        if (username == null || username.isBlank()) {
+            System.out.println("Username cannot be empty.");
+            return;
+        }
+
         this.username = username;
     }
 
     public void setPassword(String password) {
+        if (password == null || password.isBlank()) {
+            System.out.println("Password cannot be empty.");
+            return;
+        }
+        
         this.password = password;
     }
 
     public void setFullName(String fullName) {
+        if (fullName == null || fullName.isBlank()) {
+            System.out.println("Full name cannot be empty.");
+            return;
+        }
+
         this.fullName = fullName;
     }
 

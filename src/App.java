@@ -267,6 +267,29 @@ public class App {
         manager.generateReport(new CoursePerformanceReport(oop));
 
         System.out.println();
+        System.out.println("=== Admin update user test ===");
+
+        User foundUser = database.findUserByUsername("student1");
+
+        if (foundUser != null) {
+            admin.updateUserUsername(database, foundUser, "student_new");
+            admin.updateUserPassword(database, foundUser, "new123");
+            admin.updateUserFullName(database, foundUser, "John Updated Student");
+        }
+
+        System.out.println();
+
+        User loginWithOldUsername = database.authenticate("student1", "123");
+        if (loginWithOldUsername == null) {
+            System.out.println("Old login does not work anymore.");
+        }
+
+        User loginWithNewUsername = database.authenticate("student_new", "new123");
+        if (loginWithNewUsername != null) {
+            System.out.println("New login works: " + loginWithNewUsername.getFullName());
+        }
+
+        System.out.println();
         System.out.println("=== Logs test ===");
         admin.viewLogs(database);
 
