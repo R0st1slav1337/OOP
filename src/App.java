@@ -55,6 +55,17 @@ public class App {
                 10
         );
 
+        Teacher teacher2 = new Teacher(
+                "T2",
+                "teacher2", 
+                "123", 
+                "Jerry Teacher", 
+                500000, 
+                "CS", 
+                TeacherTitle.SENIOR_LECTOR, 
+                5
+        );
+
         Admin admin = new Admin(
                 "A1",
                 "admin1",
@@ -67,16 +78,46 @@ public class App {
         database.addUser(admin);
         database.addUser(student);
         database.addUser(teacher);
+        database.addUser(teacher2);
         database.addUser(manager);
 
         Course oop = new Course("CS101", "Object-Oriented Programming", 5);
         database.addCourse(oop);
-
+        
         manager.assignTeacher(oop, teacher);
+        
+        Course oopNew = new Course(
+                "CS101",
+                "Object-Oriented Programming",
+                5,
+                "Computer Science",
+                2
+        );
+        database.addCourse(oopNew);
+
+        manager.assignTeacher(oopNew, teacher2);
 
         Registration registration = student.requestRegistration(oop);
         manager.addRegistration(registration);
         manager.approveRegistration(registration);
+
+        Registration registration2 = student.requestRegistration(oopNew);
+        manager.addRegistration(registration2);
+        manager.approveRegistration(registration2);
+
+        Course medicine = new Course(
+                "MED101",
+                "Human Anatomy",
+                5,
+                "Medicine",
+                1
+        );
+
+        Registration badRegistration = student.requestRegistration(medicine);
+
+        if (badRegistration == null) {
+            System.out.println("Wrong major/year registration was blocked successfully.");
+        }
 
         System.out.println("Student courses:");
         student.viewCourses();
@@ -185,6 +226,22 @@ public class App {
         System.out.println("=== Logs test ===");
         admin.viewLogs(database);
 
+        System.out.println();
+        System.out.println("=== Observer news test ===");
+
+        manager.createNews(
+                "Registration period is open",
+                "Students can now request registration for available courses."
+        );
+
+        System.out.println();
+        student.viewNews();
+
+        System.out.println();
+        teacher.viewNews();
+
+        System.out.println();
+        database.printAllNews();
 
 
         database.save("university.ser");

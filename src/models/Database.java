@@ -16,6 +16,7 @@ public class Database implements Serializable {
     private List<ResearchProject> researchProjects = new ArrayList<>();
     private List<ResearchPaper> researchPapers = new ArrayList<>();
     private List<String> logs = new ArrayList<>();
+    private List<News> newsList = new ArrayList<>();
 
     private Database() {}
 
@@ -123,6 +124,35 @@ public class Database implements Serializable {
                         " | h-index: " + researcher.getHIndex() +
                         " | citations: " + researcher.getTotalCitations());
             }
+        }
+    }
+
+    public void publishNews(News news) {
+        newsList.add(news);
+
+        for (User user : users) {
+            user.receiveNews(news);
+        }
+
+        addLog("NEWS: published news '" + news.getTitle() + "' by " + news.getAuthor().getFullName());
+    }
+
+    public List<News> getNewsList() {
+        return newsList;
+    }
+
+    public void printAllNews() {
+        if (newsList.isEmpty()) {
+            System.out.println("No news published yet.");
+            return;
+        }
+
+        System.out.println("All university news:");
+        System.out.println("--------------------------------");
+
+        for (News news : newsList) {
+            System.out.println(news);
+            System.out.println("--------------------------------");
         }
     }
 

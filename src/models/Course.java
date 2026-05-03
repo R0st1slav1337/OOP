@@ -10,15 +10,28 @@ public class Course implements Serializable {
     private String code;
     private String name;
     private int credits;
+    private String intendedMajor;
+    private int intendedYear;
 
     private List<Teacher> instructors = new ArrayList<>();
     private List<Student> students = new ArrayList<>();
     private List<Lesson> lessons = new ArrayList<>();
 
+    // default constructor
     public Course(String code, String name, int credits) {
         this.code = code;
         this.name = name;
         this.credits = credits;
+        this.intendedMajor = "ALL";
+        this.intendedYear = 0;
+    }
+
+    public Course(String code, String name, int credits, String intendedMajor, int intendedYear) {
+        this.code = code;
+        this.name = name;
+        this.credits = credits;
+        this.intendedMajor = intendedMajor;
+        this.intendedYear = intendedYear;
     }
 
     public void addInstructor(Teacher teacher) {
@@ -31,6 +44,22 @@ public class Course implements Serializable {
         if (!students.contains(student)) {
             students.add(student);
         }
+    }
+
+    public boolean isAvailableFor(Student student) {
+        String major = intendedMajor;
+
+        if (major == null || major.isBlank()) {
+            major = "ALL";
+        }
+
+        boolean majorMatches = intendedMajor.equalsIgnoreCase("ALL")
+                || intendedMajor.equalsIgnoreCase(student.getMajor());
+
+        boolean yearMatches = intendedYear == 0
+                || intendedYear == student.getYear();
+
+        return majorMatches && yearMatches;
     }
 
     public void addLesson(Lesson lesson) {
@@ -61,9 +90,20 @@ public class Course implements Serializable {
         return lessons;
     }
 
+    public String getIntendedMajor() {
+        return intendedMajor;
+    }
+
+    public int getIntendedYear() {
+        return intendedYear;
+    }
+
     @Override
     public String toString() {
-        return code + " - " + name + " (" + credits + " credits)";
+        return code + " - " + name +
+            " (" + credits + " credits)" +
+            " | major: " + intendedMajor +
+            " | year: " + (intendedYear == 0 ? "ALL" : intendedYear);
     }
     
 }

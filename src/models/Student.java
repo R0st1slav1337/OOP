@@ -15,6 +15,7 @@ public class Student extends User implements Researcher {
     private int totalCredits;
     private int hIndex;
     private Researcher supervisor;
+    private String major;
 
     private Map<Course, Mark> marks = new HashMap<>();
     private List<Course> courses = new ArrayList<>();
@@ -26,29 +27,54 @@ public class Student extends User implements Researcher {
                    int year, String major, double gpa, int hIndex) {
         super(id, username, password, fullName);
         this.year = year;
+        this.major = major;
         this.gpa = gpa;
         this.hIndex = hIndex;
     }
 
     public Registration requestRegistration(Course course) {
         if (course == null) {
+            Database.getInstance().addLog(
+                "STUDENT: " + getFullName() + " failed to request registration because course is null."
+            );
             System.out.println("Course does not exist.");
             return null;
         }
 
         if (courses.contains(course)) {
+            Database.getInstance().addLog(
+                "STUDENT: " + getFullName() + " failed to request registration for course " +
+                        course.getName() + " because student is already registered."
+            );
             System.out.println("You are already registered for this course.");
             return null;
         }
         
-        if (totalCredits + course.getCredits() > 21 ) {
-            System.out.println("Cannot register: credit limit exceeded.");
+        if (totalCredits + course.getCredits() > 21 ) { 
             Database.getInstance().addLog(
                 "STUDENT: " + getFullName() +
                 " failed to request registration for course " + course.getName() +
                 " because credit limit was exceeded"
             );
+            System.out.println("Cannot register: credit limit exceeded.");
+            return null;
+        }
 
+        if (!course.isAvailableFor(this)) {
+            Database.getInstance().addLog(
+                "STUDENT: " + getFullName() + " failed to request registration for course " +
+                        course.getName() + " because course is not intended for student's major/year."
+            );
+            System.out.println("Cannot register: course is not intended for your major/year.");
+            return null;
+        }
+
+        if (getFailedCoursesCount() >= 3) {
+            Database.getInstance().addLog(
+                "STUDENT: " + getFullName() + " failed to request registration for course " +
+                        course.getName() + " because student has failed 3 or more courses."
+            );
+            System.out.println("Cannot register: student has failed 3 or more courses.");
             return null;
         }
 
@@ -106,8 +132,24 @@ public class Student extends User implements Researcher {
         return transcript;
     }
 
+    public int getFailedCoursesCount() {
+        int count = 0;
+
+        for (Mark mark : marks.values()) {
+            if (!mark.isPassed()) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     public int getYear() {
         return year;
+    }
+
+    public String getMajor() {
+        return major;
     }
 
     public double getGpa() {

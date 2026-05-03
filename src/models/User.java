@@ -2,12 +2,16 @@ package models;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class User implements Serializable {
+public abstract class User implements Serializable, NewsObserver {
     protected String id;
     protected String username;
     protected String password;
     protected String fullName;
+
+    private List<News> newsInbox = new ArrayList<>();
 
     public User() {}
 
@@ -42,6 +46,30 @@ public abstract class User implements Serializable {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    @Override
+    public void receiveNews(News news) {
+        if (newsInbox == null) {
+            newsInbox = new ArrayList<>();
+        }
+
+        newsInbox.add(news);
+    }
+
+    public void viewNews() {
+        if (newsInbox == null || newsInbox.isEmpty()) {
+            System.out.println("No news available.");
+            return;
+        }
+
+        System.out.println("News for " + getFullName() + ":");
+        System.out.println("--------------------------------");
+
+        for (News news : newsInbox) {
+            System.out.println(news);
+            System.out.println("--------------------------------");
+        }
     }
 
     @Override

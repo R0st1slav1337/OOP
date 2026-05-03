@@ -49,6 +49,34 @@ public class Manager extends Employee {
             return;
         }
 
+        if (!course.isAvailableFor(student)) {
+            System.out.println("Cannot approve: course is not intended for student's major/year.");
+            registration.reject();
+
+            Database.getInstance().addLog(
+                    "MANAGER: " + getFullName() +
+                            " rejected registration of " + student.getFullName() +
+                            " for course " + course.getName() +
+                            " because course is not intended for student's major/year."
+            );
+
+            return;
+        }
+
+        if (student.getFailedCoursesCount() >= 3) {
+            System.out.println("Cannot approve: student has failed 3 or more courses.");
+            registration.reject();
+
+            Database.getInstance().addLog(
+                    "MANAGER: " + getFullName() +
+                            " rejected registration of " + student.getFullName() +
+                            " for course " + course.getName() +
+                            " because student has failed 3 or more courses."
+            );
+
+            return;
+        }
+
         registration.approve();
         student.addCourse(course);
         course.addStudent(student);
@@ -105,6 +133,14 @@ public class Manager extends Employee {
         Database.getInstance().addLog(
                 "MANAGER: " + getFullName() + " generated report: " + strategy.getName()
         );
+    }
+
+    public void createNews(String title, String content) {
+        News news = new News(title, content, this);
+
+        Database.getInstance().publishNews(news);
+
+        System.out.println("News was published successfully.");
     }
 
     public void viewStudentsSortedByGpa(List<Student> students) {
