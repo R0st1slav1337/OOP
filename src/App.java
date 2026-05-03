@@ -181,6 +181,35 @@ public class App {
         }
 
         System.out.println();
+        System.out.println("=== Employee request test ===");
+
+        admin.setSigningRole(RequestSignerRole.RECTOR);
+
+        EmployeeRequest request = teacher.createRequest("Extra practice lesson",
+        "I need permission to organize an additional OOP practice lesson before the final exam."
+        );
+
+        System.out.println();
+
+        manager.viewSignedRequests();
+
+        System.out.println();
+
+        admin.signRequest(request);
+
+        System.out.println();
+
+        manager.viewSignedRequests();
+
+        System.out.println();
+
+        manager.approveRequest(request);
+
+        System.out.println();
+
+        database.printAllEmployeeRequests();
+
+        System.out.println();
         System.out.println("=== Research test ===");
         
         ResearchPaper paper1 = new ResearchPaper(

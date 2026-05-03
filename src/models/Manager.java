@@ -2,6 +2,7 @@ package models;
 
 import enums.ManagerType;
 import enums.RegistrationStatus;
+import enums.RequestStatus;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -141,6 +142,58 @@ public class Manager extends Employee {
         Database.getInstance().publishNews(news);
 
         System.out.println("News was published successfully.");
+    }
+
+    public void viewSignedRequests() {
+        Database.getInstance().printSignedEmployeeRequests();
+
+        Database.getInstance().addLog(
+                "MANAGER: " + getFullName() + " viewed signed employee requests."
+        );
+    }
+
+    public void approveRequest(EmployeeRequest request) {
+        if (request == null) {
+            System.out.println("Request does not exist.");
+            return;
+        }
+
+        if (request.getStatus() != RequestStatus.SIGNED) {
+            System.out.println("Only signed requests can be approved.");
+            return;
+        }
+
+        request.approve();
+
+        Database.getInstance().addLog(
+                "MANAGER: " + getFullName() +
+                        " approved request '" + request.getTitle() +
+                        "' from " + request.getSender().getFullName()
+        );
+
+        System.out.println("Request approved successfully.");
+    }
+
+    public void rejectRequest(EmployeeRequest request) {
+        if (request == null) {
+            System.out.println("Request does not exist.");
+            return;
+        }
+
+        if (request.getStatus() != RequestStatus.SIGNED) {
+            System.out.println("Only signed requests can be rejected.");
+            return;
+        }
+
+        request.reject();
+
+        Database.getInstance().addLog(
+                "MANAGER: " + getFullName() +
+                        " rejected request '" + request.getTitle() +
+                        "' from " + request.getSender().getFullName()
+        );
+
+        System.out.println("Request rejected successfully.");
     }
 
     public void viewStudentsSortedByGpa(List<Student> students) {

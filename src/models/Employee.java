@@ -1,5 +1,7 @@
 package models;
 
+import enums.RequestSignerRole;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,8 @@ public class Employee extends User {
 
     private List<Complaint> receivedComplaints = new ArrayList<>();
     private List<Complaint> sentComplaints = new ArrayList<>();
+
+    private RequestSignerRole signingRole;
 
     public Employee() {}
 
@@ -181,6 +185,65 @@ public class Employee extends User {
         );
 
         System.out.println("Complaint resolved successfully.");
+    }
+
+    public void setSigningRole(RequestSignerRole signingRole) {
+        this.signingRole = signingRole;
+
+        Database.getInstance().addLog(
+                "EMPLOYEE: " + getFullName() +
+                        " was assigned signing role: " + signingRole
+        );
+    }
+
+    public RequestSignerRole getSigningRole() {
+        return signingRole;
+    }
+
+    public boolean canSignRequests() {
+        return signingRole != null;
+    }
+
+    public EmployeeRequest createRequest(String title, String description) {
+        if (title == null || title.isBlank()) {
+            System.out.println("Request title cannot be empty.");
+            return null;
+        }
+
+        if (description == null || description.isBlank()) {
+            System.out.println("Request description cannot be empty.");
+            return null;
+        }
+
+        EmployeeRequest request = new EmployeeRequest(this, title, description);
+        Database.getInstance().addEmployeeRequest(request);
+
+        Database.getInstance().addLog(
+                "EMPLOYEE: " + getFullName() +
+                        " created request: " + title
+        );
+
+        System.out.println("Request created successfully.");
+        return request;
+    }
+
+    public void signRequest(EmployeeRequest request) {
+        if (request == null) {
+            System.out.println("Request does not exist.");
+            return;
+        }
+
+        request.sign(this);
+
+        if (request.getSignedBy() == this) {
+            Database.getInstance().addLog(
+                    "EMPLOYEE: " + getFullName() +
+                            " signed request '" + request.getTitle() +
+                            "' as " + signingRole
+            );
+
+            System.out.println("Request signed successfully.");
+        }
     }
 
     public double getSalary() {

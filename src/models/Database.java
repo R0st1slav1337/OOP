@@ -1,4 +1,5 @@
 package models;
+import enums.RequestStatus;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,6 +18,7 @@ public class Database implements Serializable {
     private List<ResearchPaper> researchPapers = new ArrayList<>();
     private List<String> logs = new ArrayList<>();
     private List<News> newsList = new ArrayList<>();
+    private List<EmployeeRequest> employeeRequests = new ArrayList<>();
 
     private Database() {}
 
@@ -310,6 +312,84 @@ public class Database implements Serializable {
 
         for (News news : newsList) {
             System.out.println(news);
+            System.out.println("--------------------------------");
+        }
+    }
+
+    // Ensure employee requests list is initialized
+    private void ensureEmployeeRequests() {
+        if (employeeRequests == null) {
+            employeeRequests = new ArrayList<>();
+        }
+    }
+
+    // Add employee request
+    public void addEmployeeRequest(EmployeeRequest request) {
+        ensureEmployeeRequests();
+
+        if (request == null) {
+            System.out.println("Request does not exist.");
+            return;
+        }
+
+        if (!employeeRequests.contains(request)) {
+            employeeRequests.add(request);
+        }
+    }
+
+    // Get employee requests
+    public List<EmployeeRequest> getEmployeeRequests() {
+        ensureEmployeeRequests();
+        return employeeRequests;
+    }
+
+    // Get signed employee requests
+    public List<EmployeeRequest> getSignedEmployeeRequests() {
+        ensureEmployeeRequests();
+
+        List<EmployeeRequest> signedRequests = new ArrayList<>();
+
+        for (EmployeeRequest request : employeeRequests) {
+            if (request.getStatus() == RequestStatus.SIGNED) {
+                signedRequests.add(request);
+            }
+        }
+
+        return signedRequests;
+    }
+
+    // Print all employee requests
+    public void printAllEmployeeRequests() {
+        ensureEmployeeRequests();
+
+        if (employeeRequests.isEmpty()) {
+            System.out.println("No employee requests found.");
+            return;
+        }
+
+        System.out.println("All employee requests:");
+        System.out.println("--------------------------------");
+
+        for (EmployeeRequest request : employeeRequests) {
+            System.out.println(request);
+            System.out.println("--------------------------------");
+        }
+    }
+
+    // Print signed employee requests
+    public void printSignedEmployeeRequests() {
+        List<EmployeeRequest> signedRequests = getSignedEmployeeRequests();
+
+        if (signedRequests.isEmpty()) {
+            System.out.println("No signed employee requests found.");
+            return;
+        }
+
+        System.out.println("Signed employee requests:");
+        System.out.println("--------------------------------");
+
+        for (EmployeeRequest request : signedRequests) {
+            System.out.println(request);
             System.out.println("--------------------------------");
         }
     }
