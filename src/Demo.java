@@ -398,11 +398,15 @@ public class Demo {
             System.out.println("7. Create news");
             System.out.println("8. View signed employee requests");
             System.out.println("9. Approve signed employee request");
-            System.out.println("10. View inbox");
-            System.out.println("11. Send message to employee");
-            System.out.println("12. Generate course report");
-            System.out.println("13. Show top cited researcher");
-            System.out.println("14. Show top cited researcher by year");
+            System.out.println("10. Reject signed employee request");
+            System.out.println("11. View inbox");
+            System.out.println("12. Send message to employee");
+            System.out.println("13. Generate course report");
+            System.out.println("14. Show top cited researcher");
+            System.out.println("15. Show top cited researcher by year");
+            System.out.println("16. View students sorted by GPA");
+            System.out.println("17. View students alphabetically");
+            System.out.println("18. View teachers alphabetically");
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
 
@@ -434,22 +438,34 @@ public class Demo {
                     manager.viewSignedRequests();
                     break;
                 case 9:
-                    approveEmployeeRequest(database, manager);
+                    processEmployeeRequest(database, manager, true);
                     break;
                 case 10:
-                    manager.viewInbox();
+                    processEmployeeRequest(database, manager, false);
                     break;
                 case 11:
-                    sendEmployeeMessage(database, manager);
+                    manager.viewInbox();
                     break;
                 case 12:
-                    generateCourseReport(database, manager);
+                    sendEmployeeMessage(database, manager);
                     break;
                 case 13:
-                    database.printTopCitedResearcher();
+                    generateCourseReport(database, manager);
                     break;
                 case 14:
+                    database.printTopCitedResearcher();
+                    break;
+                case 15:
                     printTopCitedResearcherByYear(database);
+                    break;
+                case 16:
+                    manager.viewStudentsSortedByGpa(database);
+                    break;
+                case 17:
+                    manager.viewStudentsAlphabetically(database);
+                    break;
+                case 18:
+                    manager.viewTeachersAlphabetically(database);
                     break;
                 case 0:
                     loggedIn = false;
@@ -469,14 +485,15 @@ public class Demo {
             System.out.println();
             System.out.println("=== Admin Menu: " + admin.getFullName() + " ===");
             System.out.println("1. View users");
-            System.out.println("2. Update username");
-            System.out.println("3. Update password");
-            System.out.println("4. Update full name");
-            System.out.println("5. View logs");
-            System.out.println("6. View inbox");
-            System.out.println("7. Send message to employee");
-            System.out.println("8. Set employee signing role");
-            System.out.println("9. Sign employee request");
+            System.out.println("2. Remove user");
+            System.out.println("3. Update username");
+            System.out.println("4. Update password");
+            System.out.println("5. Update full name");
+            System.out.println("6. View logs");
+            System.out.println("7. View inbox");
+            System.out.println("8. Send message to employee");
+            System.out.println("9. Set employee signing role");
+            System.out.println("10. Sign employee request");
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
 
@@ -487,27 +504,30 @@ public class Demo {
                     admin.viewUsers(database);
                     break;
                 case 2:
-                    updateUsername(database, admin);
+                    removeUser(database, admin);
                     break;
                 case 3:
-                    updatePassword(database, admin);
+                    updateUsername(database, admin);
                     break;
                 case 4:
-                    updateFullName(database, admin);
+                    updatePassword(database, admin);
                     break;
                 case 5:
-                    admin.viewLogs(database);
+                    updateFullName(database, admin);
                     break;
                 case 6:
-                    admin.viewInbox();
+                    admin.viewLogs(database);
                     break;
                 case 7:
-                    sendEmployeeMessage(database, admin);
+                    admin.viewInbox();
                     break;
                 case 8:
-                    setSigningRole(database);
+                    sendEmployeeMessage(database, admin);
                     break;
                 case 9:
+                    setSigningRole(database);
+                    break;
+                case 10:
                     signEmployeeRequest(database, admin);
                     break;
                 case 0:
@@ -932,6 +952,35 @@ public class Demo {
         }
     }
 
+    // Helper method for removing a user by admin with username input, user selection, confirmation, and user removal
+    private static void removeUser(Database database, Admin admin) {
+        System.out.print("Username to remove: ");
+        String username = readLine();
+
+        User user = database.findUserByUsername(username);
+
+        if (user == null) {
+            System.out.println("User not found.");
+            return;
+        }
+
+        if (user == admin) {
+            System.out.println("Admin cannot remove himself/herself.");
+            return;
+        }
+
+        System.out.println("Are you sure you want to remove " + user.getFullName() + "? yes/no");
+        String answer = readLine();
+
+        if (!answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("y")) {
+            System.out.println("Remove cancelled.");
+            return;
+        }
+
+        admin.removeUser(database, user);
+        System.out.println("User removed successfully.");
+    }
+
     // Helper method for adding a new research paper by researcher with paper details input and paper creation
     private static void addResearchPaper(Database database, User user, Researcher researcher) {
         System.out.print("Paper title: ");
@@ -1126,9 +1175,9 @@ public class Demo {
         employee.createRequest(title, description);
     }
 
-    // Helper method for approving a signed employee request by manager with signed requests display, selection, and approval
-    private static void approveEmployeeRequest(Database database, Manager manager) {
-        java.util.List<EmployeeRequest> signedRequests = database.getSignedEmployeeRequests();
+    // Helper method for processing employee requests by manager with signed requests display, selection, and approval/rejection
+    private static void processEmployeeRequest(Database database, Manager manager, boolean approve) {
+        List<EmployeeRequest> signedRequests = database.getSignedEmployeeRequests();
 
         if (signedRequests.isEmpty()) {
             System.out.println("No signed employee requests found.");
@@ -1136,8 +1185,11 @@ public class Demo {
         }
 
         for (int i = 0; i < signedRequests.size(); i++) {
-            System.out.println((i + 1) + ". " + signedRequests.get(i).getTitle() +
-                    " from " + signedRequests.get(i).getSender().getFullName());
+            EmployeeRequest request = signedRequests.get(i);
+
+            System.out.println((i + 1) + ". " + request.getTitle() +
+                " from " + request.getSender().getFullName() +
+                " | Signed by: " + request.getSignedBy().getFullName());
         }
 
         System.out.print("Choose request number: ");
@@ -1148,7 +1200,13 @@ public class Demo {
             return;
         }
 
-        manager.approveRequest(signedRequests.get(index));
+        EmployeeRequest request = signedRequests.get(index);
+
+        if (approve) {
+            manager.approveRequest(request);
+        } else {
+            manager.rejectRequest(request);
+        }
     }
 
     // Helper method for signing an employee request by employee with requests display, selection, and signing
