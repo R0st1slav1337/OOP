@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.util.Comparator;
-
 public class Student extends User implements Researcher {
     private int year;
     private double gpa;
@@ -88,7 +86,7 @@ public class Student extends User implements Researcher {
 
         return new Registration(this, course);
     }
-
+    
     void addCourse(Course course) {
         if (!courses.contains(course)) {
             courses.add(course);
@@ -284,6 +282,40 @@ public class Student extends User implements Researcher {
         }
 
         course.printSchedule();
+    }
+
+    public void viewTeachersForCourse(Course course) {
+        if (course == null) {
+            System.out.println("Course does not exist.");
+            return;
+        }
+
+        if (!courses.contains(course)) {
+            System.out.println("You are not registered for this course.");
+            return;
+        }
+
+        if (course.getInstructors() == null || course.getInstructors().isEmpty()) {
+            System.out.println("No teachers assigned to this course.");
+            return;
+        }
+
+        System.out.println("Teachers for course: " + course.getName());
+        System.out.println("--------------------------------");
+
+        for (Teacher teacher : course.getInstructors()) {
+            System.out.println("Name: " + teacher.getFullName());
+            System.out.println("Department: " + teacher.getDepartment());
+            System.out.println("Title: " + teacher.getTitle());
+            System.out.println("H-index: " + teacher.getHIndex());
+            System.out.printf("Average rating: %.2f/5%n", teacher.getAverageRating());
+            System.out.println("--------------------------------");
+        }
+
+        Database.getInstance().addLog(
+                "STUDENT: " + getFullName() +
+                    " viewed teacher info for course " + course.getName()
+        );
     }
 
     public int getYear() {

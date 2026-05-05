@@ -234,6 +234,40 @@ public class Teacher extends Employee implements Researcher {
         }
     }
 
+    public void viewStudentsForCourse(Course course) {
+        if (course == null) {
+            System.out.println("Course does not exist.");
+            return;
+        }
+
+        if (!courses.contains(course)) {
+            System.out.println("You are not assigned to this course.");
+            return;
+        }
+
+        if (course.getStudents() == null || course.getStudents().isEmpty()) {
+            System.out.println("No students registered for this course.");
+            return;
+        }
+
+        System.out.println("Students for course: " + course.getName());
+        System.out.println("--------------------------------");
+
+        for (Student student : course.getStudents()) {
+            System.out.println("Name: " + student.getFullName());
+            System.out.println("Username: " + student.getUsername());
+            System.out.println("Major: " + student.getMajor());
+            System.out.println("Year: " + student.getYear());
+            System.out.printf("GPA: %.2f%n", student.calculateGpa());
+            System.out.println("--------------------------------");
+        }
+
+        Database.getInstance().addLog(
+            "TEACHER: " + getFullName() +
+                    " viewed students for course " + course.getName()
+        );
+    }
+
     public TeacherTitle getTitle() {
         return title;
     }
@@ -276,6 +310,10 @@ public class Teacher extends Employee implements Researcher {
             "RESEARCH: " + getFullName() +
             " joined research project '" + project.getTopic() + "'"
         );
+    }
+
+    public String getDepartment() {
+        return department;
     }
 
     @Override
