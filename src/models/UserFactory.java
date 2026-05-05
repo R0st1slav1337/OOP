@@ -31,6 +31,14 @@ public class UserFactory {
                 user = createAdmin(id, username, password, fullName, 0, "Administration");
                 break;
 
+            case EMPLOYEE:
+                user = createEmployee(id, username, password, fullName, 0, "Unknown department");
+                break;
+
+            case RESEARCH_EMPLOYEE:
+                user = createResearchEmployee(id, username, password, fullName, 0, "Unknown department", 0);
+                break;
+
             default:
                 throw new IllegalArgumentException("Unknown user type: " + userType);
         }
@@ -141,5 +149,55 @@ public class UserFactory {
         );
 
         return admin;
+    }
+
+    public static Employee createEmployee(
+            String id,
+            String username,
+            String password,
+            String fullName,
+            double salary,
+            String department
+    ) {
+        Employee employee = new Employee(
+                id,
+                username,
+                password,
+                fullName,
+                salary,
+                department
+        );
+
+        Database.getInstance().addLog(
+            "FACTORY: created EMPLOYEE user " + fullName
+        );
+
+        return employee;
+    }
+
+    public static ResearchEmployee createResearchEmployee(
+            String id,
+            String username,
+            String password,
+            String fullName,
+            double salary,
+            String department,
+            int hIndex
+    ) {
+        ResearchEmployee researchEmployee = new ResearchEmployee(
+                id,
+                username,
+                password,
+                fullName,
+                salary,
+                department,
+                hIndex
+        );
+
+        Database.getInstance().addLog(
+            "FACTORY: created RESEARCH_EMPLOYEE user " + fullName
+        );
+
+        return researchEmployee;
     }
 }

@@ -179,6 +179,44 @@ public class Demo {
                 );
                 break;
 
+            case EMPLOYEE:
+                System.out.print("Salary: ");
+                double employeeSalary = readDouble();
+
+                System.out.print("Department: ");
+                String employeeDepartment = readLine();
+
+                user = UserFactory.createEmployee(
+                        id,
+                        username,
+                        password,
+                        fullName,
+                        employeeSalary,
+                        employeeDepartment
+                );
+                break;
+
+            case RESEARCH_EMPLOYEE:
+                System.out.print("Salary: ");
+                double researchEmployeeSalary = readDouble();
+
+                System.out.print("Department: ");
+                String researchEmployeeDepartment = readLine();
+
+                System.out.print("H-index: ");
+                int researchEmployeeHIndex = readInt();
+
+                user = UserFactory.createResearchEmployee(
+                        id,
+                        username,
+                        password,
+                        fullName,
+                        researchEmployeeSalary,
+                        researchEmployeeDepartment,
+                        researchEmployeeHIndex
+                );
+                break;
+
             default:
                 System.out.println("Unknown user type.");
                 return null;
@@ -198,6 +236,10 @@ public class Demo {
             managerMenu(database, (Manager) user);
         } else if (user instanceof Teacher) {
             teacherMenu(database, (Teacher) user);
+        } else if (user instanceof ResearchEmployee) {
+            employeeMenu(database, (Employee) user);
+        } else if (user instanceof Employee) {
+            employeeMenu(database, (Employee) user);
         } else {
             System.out.println("Unknown user role.");
         }
@@ -452,6 +494,60 @@ public class Demo {
                     break;
                 case 9:
                     signEmployeeRequest(database, admin);
+                    break;
+                case 0:
+                    loggedIn = false;
+                    System.out.println("Logged out.");
+                    break;
+                default:
+                    System.out.println("Wrong option.");
+            }
+        }
+    }
+
+    private static void employeeMenu(Database database, Employee employee) {
+        boolean loggedIn = true;
+
+        while (loggedIn) {
+            System.out.println();
+            System.out.println("=== Employee Menu: " + employee.getFullName() + " ===");
+            System.out.println("1. View inbox");
+            System.out.println("2. Send message to employee");
+            System.out.println("3. Send complaint");
+            System.out.println("4. Create employee request");
+            System.out.println("5. View news");
+
+            if (employee instanceof Researcher) {
+                System.out.println("6. Research menu");
+            }
+
+            System.out.println("0. Logout");
+            System.out.print("Choose option: ");
+
+            int choice = readInt();
+
+            switch (choice) {
+                case 1:
+                    employee.viewInbox();
+                    break;
+                case 2:
+                    sendEmployeeMessage(database, employee);
+                    break;
+                case 3:
+                    sendEmployeeComplaint(database, employee);
+                    break;
+                case 4:
+                    createEmployeeRequest(employee);
+                    break;
+                case 5:
+                    employee.viewNews();
+                    break;
+                case 6:
+                    if (employee instanceof Researcher) {
+                        researchMenu(database, employee, (Researcher) employee);
+                    } else {
+                        System.out.println("Wrong option.");
+                    }
                     break;
                 case 0:
                     loggedIn = false;
