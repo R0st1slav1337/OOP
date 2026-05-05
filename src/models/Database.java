@@ -1,5 +1,6 @@
 package models;
 import enums.RequestStatus;
+import enums.RegistrationStatus;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,6 +20,7 @@ public class Database implements Serializable {
     private List<String> logs = new ArrayList<>();
     private List<News> newsList = new ArrayList<>();
     private List<EmployeeRequest> employeeRequests = new ArrayList<>();
+    private List<Registration> registrations = new ArrayList<>();
 
     private Database() {}
 
@@ -55,6 +57,10 @@ public class Database implements Serializable {
 
         if (newsList == null) {
             newsList = new ArrayList<>();
+        }
+
+        if (registrations == null) {
+            registrations = new ArrayList<>();
         }
     }
 
@@ -548,6 +554,59 @@ public class Database implements Serializable {
         }
     }
 
+    public void addRegistration(Registration registration) {
+        ensureStorage();
+
+        if (registration == null) {
+            System.out.println("Registration does not exist.");
+            return;
+        }
+
+        if (!registrations.contains(registration)) {
+            registrations.add(registration);
+            addLog(
+                "DATABASE: added registration request from " +
+                        registration.getStudent().getFullName() +
+                        " for course " + registration.getCourse().getName()
+            );
+        }
+    }
+
+    public List<Registration> getRegistrations() {
+        ensureStorage();
+        return registrations;
+    }
+
+    public List<Registration> getPendingRegistrations() {
+        ensureStorage();
+
+        List<Registration> pending = new ArrayList<>();
+
+        for (Registration registration : registrations) {
+            if (registration.getStatus() == RegistrationStatus.PENDING) {
+                pending.add(registration);
+            }
+        }
+
+        return pending;
+    }
+
+    public void printPendingRegistrations() {
+        List<Registration> pending = getPendingRegistrations();
+
+        if (pending.isEmpty()) {
+            System.out.println("No pending registrations.");
+            return;
+        }
+
+        System.out.println("Pending registrations:");
+        System.out.println("--------------------------------");
+
+        for (int i = 0; i < pending.size(); i++) {
+            System.out.println((i + 1) + ". " + pending.get(i));
+        }
+    }
+
     public List<User> getUsers() {
         ensureStorage();
         return users;
@@ -574,6 +633,7 @@ public class Database implements Serializable {
         System.out.println("=== Database Summary ===");
         System.out.println("Users: " + users.size());
         System.out.println("Courses: " + courses.size());
+        System.out.println("Registrations: " + registrations.size());
         System.out.println("Research papers: " + researchPapers.size());
         System.out.println("Research projects: " + researchProjects.size());
         System.out.println("News: " + newsList.size());

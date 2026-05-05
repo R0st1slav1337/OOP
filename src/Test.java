@@ -8,7 +8,7 @@ import java.util.List;
 import exceptions.LowHIndexException;
 import exceptions.NotResearcherException;
 
-public class App {
+public class Test {
     public static void main(String[] args) {
         Database database = Database.getInstance();
 
