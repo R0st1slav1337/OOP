@@ -41,6 +41,10 @@ public class Course implements Serializable {
     }
 
     public void addStudent(Student student) {
+        if (student == null) {
+            return;
+        }
+
         if (students == null) {
             students = new ArrayList<>();
         }
@@ -57,14 +61,18 @@ public class Course implements Serializable {
     }
 
     public boolean isAvailableFor(Student student) {
+        if (student == null) {
+            return false;
+        }
+        
         String major = intendedMajor;
 
         if (major == null || major.isBlank()) {
             major = "ALL";
         }
 
-        boolean majorMatches = intendedMajor.equalsIgnoreCase("ALL")
-                || intendedMajor.equalsIgnoreCase(student.getMajor());
+        boolean majorMatches = major.equalsIgnoreCase("ALL")
+                || major.equalsIgnoreCase(student.getMajor());
 
         boolean yearMatches = intendedYear == 0
                 || intendedYear == student.getYear();
@@ -73,13 +81,13 @@ public class Course implements Serializable {
     }
 
     public void addLesson(Lesson lesson) {
-        if (lessons == null) {
-            lessons = new ArrayList<>();
-        }
-
         if (lesson == null) {
             System.out.println("Lesson does not exist.");
             return;
+        }
+        
+        if (lessons == null) {
+            lessons = new ArrayList<>();
         }
 
         if (!lessons.contains(lesson)) {

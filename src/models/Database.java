@@ -59,6 +59,10 @@ public class Database implements Serializable {
             newsList = new ArrayList<>();
         }
 
+        if (employeeRequests == null) {
+            employeeRequests = new ArrayList<>();
+        }       
+
         if (registrations == null) {
             registrations = new ArrayList<>();
         }

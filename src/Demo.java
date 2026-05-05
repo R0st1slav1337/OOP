@@ -248,7 +248,6 @@ public class Demo {
                     researchMenu(database, student, student);
                     break;
                 case 0:
-                    System.out.println("5. Create lesson");
                     loggedIn = false;
                     System.out.println("Logged out.");
                     break;
