@@ -494,6 +494,8 @@ public class Demo {
             System.out.println("8. Send message to employee");
             System.out.println("9. Set employee signing role");
             System.out.println("10. Sign employee request");
+            System.out.println("11. View received complaints");
+            System.out.println("12. Resolve complaint");
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
 
@@ -529,6 +531,12 @@ public class Demo {
                     break;
                 case 10:
                     signEmployeeRequest(database, admin);
+                    break;
+                case 11:
+                    admin.viewReceivedComplaints();
+                    break;
+                case 12:
+                    resolveComplaint(admin);
                     break;
                 case 0:
                     loggedIn = false;
@@ -981,6 +989,37 @@ public class Demo {
         System.out.println("User removed successfully.");
     }
 
+    // Helper method for resolving a complaint by admin with received complaints display, selection, and complaint resolution
+    private static void resolveComplaint(Admin admin) {
+        List<Complaint> complaints = admin.getReceivedComplaints();
+
+        if (complaints == null || complaints.isEmpty()) {
+            System.out.println("No received complaints found.");
+            return;
+        }
+
+        System.out.println("Received complaints:");
+        System.out.println("--------------------------------");
+
+        for (int i = 0; i < complaints.size(); i++) {
+            Complaint complaint = complaints.get(i);
+
+            System.out.println((i + 1) + ". " + complaint.getSubject() +
+                " | From: " + complaint.getSender().getFullName() +
+                " | Status: " + (complaint.isResolved() ? "RESOLVED" : "OPEN"));
+        }
+
+        System.out.print("Choose complaint number: ");
+        int index = readInt() - 1;
+
+        if (index < 0 || index >= complaints.size()) {
+            System.out.println("Wrong complaint number.");
+            return;
+        }
+
+        admin.resolveComplaint(complaints.get(index));
+    }
+
     // Helper method for adding a new research paper by researcher with paper details input and paper creation
     private static void addResearchPaper(Database database, User user, Researcher researcher) {
         System.out.print("Paper title: ");
@@ -1360,7 +1399,16 @@ public class Demo {
             try {
                 System.out.print("Date yyyy-MM-dd: ");
                 String input = readLine();
-                return LocalDate.parse(input);
+                LocalDate date = LocalDate.parse(input);
+
+                int year = date.getYear();
+
+                if (year < 1900 || year > LocalDate.now().getYear()) {
+                    System.out.println("Year must be between 1900 and current year.");
+                    continue;
+                }
+                
+                return date;
             } catch (DateTimeParseException e) {
                 System.out.println("Wrong date format. Example: 2026-05-01");
             }

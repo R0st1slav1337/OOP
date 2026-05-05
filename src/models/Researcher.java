@@ -47,8 +47,16 @@ public interface Researcher {
     }
 
     default int getCitationsByYear(int year) {
-        return getResearchPapers().stream()
-                .filter(paper -> paper.getPublicationDate().getYear() == year)
-                .mapToInt(ResearchPaper::getCitations).sum();
+        int total = 0;
+
+        for (ResearchPaper paper : getResearchPapers()) {
+            if (paper != null &&
+                    paper.getPublicationDate() != null &&
+                    paper.getPublicationDate().getYear() == year) {
+                total += paper.getCitations();
+            }
+        }
+
+        return total;
     }
 }

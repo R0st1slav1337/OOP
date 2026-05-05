@@ -324,7 +324,7 @@ public class Database implements Serializable {
     // Get top cited researcher by year
     public Researcher getTopCitedResearcherByYear(int year) {
         Researcher topResearcher = null;
-        int maxCitations = -1;
+        int maxCitations = 0;
 
         for (User user : users) {
             if (user instanceof Researcher) {
@@ -345,7 +345,7 @@ public class Database implements Serializable {
     public void printTopCitedResearcherByYear(int year) {
         Researcher researcher = getTopCitedResearcherByYear(year);
 
-        if (researcher == null || researcher.getCitationsByYear(year) == 0) {
+        if (researcher == null) {
             System.out.println("No cited researchers found for year: " + year);
             return;
         }

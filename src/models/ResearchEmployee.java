@@ -87,11 +87,10 @@ public class ResearchEmployee extends Employee implements Researcher {
 
     @Override
     public String toString() {
-        return "ResearchEmployee{" +
-                "id='" + getId() + '\'' +
-                ", username='" + getUsername() + '\'' +
-                ", fullName='" + getFullName() + '\'' +
-                ", hIndex=" + hIndex +
-                '}';
+        return getFullName() +
+            " | username: " + getUsername() +
+            " | department: " + getDepartment() +
+            " | h-index: " + hIndex +
+            " | role: Research Employee";
     }
 }
