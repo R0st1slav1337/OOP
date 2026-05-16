@@ -268,6 +268,52 @@ public class Teacher extends Employee implements Researcher {
         );
     }
 
+    public void viewAttendanceReport(Course course) {
+        if (course == null) {
+            System.out.println("Course does not exist.");
+            return;
+        }
+
+        if (courses == null || !courses.contains(course)) {
+            System.out.println("Cannot view attendance report: teacher is not assigned to this course.");
+            return;
+        }
+
+        course.printAttendanceReport();
+
+        Database.getInstance().addLog(
+                "TEACHER: " + getFullName() +
+                        " viewed attendance report for course " + course.getName()
+        );
+    }
+
+    public void printTeacherDetails() {
+        System.out.println("=== Teacher Details ===");
+        System.out.println("Full name: " + getFullName());
+        System.out.println("Username: " + getUsername());
+        System.out.println("Department: " + getDepartment());
+        System.out.println("Title: " + title);
+        System.out.println("Salary: " + getSalary());
+        System.out.println("H-index: " + getHIndex());
+        System.out.printf("Average rating: %.2f/5%n", getAverageRating());
+
+        System.out.println();
+        System.out.println("Courses:");
+        if (courses == null || courses.isEmpty()) {
+            System.out.println("- No courses assigned");
+        } else {
+            for (Course course : courses) {
+                System.out.println("- " + course.getCode() + " - " + course.getName());
+            }
+        }
+
+        System.out.println();
+        System.out.println("Research:");
+        System.out.println("Research papers: " + getResearchPapers().size());
+        System.out.println("Research projects: " + getResearchProjects().size());
+        System.out.println("Total citations: " + getTotalCitations());
+    }
+
     public TeacherTitle getTitle() {
         return title;
     }

@@ -8,6 +8,12 @@ import java.util.List;
 import java.io.*;
 import java.time.LocalDateTime;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.format.DateTimeFormatter;
+
 public class Database implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -645,31 +651,88 @@ public class Database implements Serializable {
         System.out.println("Logs: " + logs.size());
     }
     
-    // Save data to database
-    public void save(String fileName) {
-        addLog("DATABASE: database saved to file " + fileName);
+    // Save data to database file, return true if success, false if failed
+    public boolean save(String fileName) {
+        ensureStorage();
 
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
-            out.writeObject(this);
-            System.out.println("Database saved successfully.");
+        try {
+            Path path = Paths.get(fileName);
+            Path parent = path.getParent();
+
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+
+            if (Files.exists(path)) {
+                String timestamp = LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+
+                String originalName = path.getFileName().toString();
+                String baseName = originalName.endsWith(".ser")
+                        ? originalName.substring(0, originalName.length() - 4)
+                        : originalName;
+
+                Path backupPath;
+
+                if (parent == null) {
+                    backupPath = Paths.get(baseName + "_backup_" + timestamp + ".ser");
+                } else {
+                    backupPath = parent.resolve(baseName + "_backup_" + timestamp + ".ser");
+                }
+
+                Files.copy(path, backupPath, StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("Backup created: " + backupPath);
+            }
+
+            addLog("DATABASE: database saved to file " + fileName);
+
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
+                out.writeObject(this);
+            }
+
+            System.out.println("Database saved successfully to: " + fileName);
+            return true;
+
         } catch (IOException e) {
             System.out.println("Error while saving database: " + e.getMessage());
+            return false;
         }
+    }
+
+    // Try to load data from database, return null if failed
+    public static Database tryLoad(String fileName) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
+            instance = (Database) in.readObject();
+            instance.ensureStorage();
+            instance.addLog("DATABASE: database loaded from file " + fileName);
+
+            System.out.println("Database loaded successfully from: " + fileName);
+            return instance;
+        } catch (IOException | ClassNotFoundException | ClassCastException e) {
+            System.out.println("Could not load database from: " + fileName);
+            System.out.println("Reason: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Create new database
+    public static Database createNew() {
+        instance = new Database();
+        instance.ensureStorage();
+        instance.addLog("DATABASE: new database was created.");
+
+        return instance;
     }
 
     // Load data from database
     public static Database load(String fileName) {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
-            instance = (Database) in.readObject();
-            instance.addLog("DATABASE: database loaded from file " + fileName);
-            System.out.println("Database loaded successfully.");
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Could not load database. New database was created.");
-            instance = new Database();
-            instance.addLog("DATABASE: new database was created because loading failed.");
+        Database database = tryLoad(fileName);
+
+        if (database == null) {
+            database = createNew();
         }
 
-        return instance;
+        return database;
     }
 
 }

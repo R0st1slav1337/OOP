@@ -34,48 +34,22 @@ public class Student extends User implements Researcher {
     // if the student is already registered, if the credit limit is exceeded, if the course is intended for the student's major/year, 
     // and if the student has failed 3 or more courses. If all checks pass, it creates a new Registration object and returns it.
     public Registration requestRegistration(Course course) {
-        if (course == null) {
-            Database.getInstance().addLog(
-                "STUDENT: " + getFullName() + " failed to request registration because course is null."
-            );
-            System.out.println("Course does not exist.");
-            return null;
-        }
+        String blockReason = getRegistrationBlockReason(course);
 
-        if (courses.contains(course)) {
-            Database.getInstance().addLog(
-                "STUDENT: " + getFullName() + " failed to request registration for course " +
-                        course.getName() + " because student is already registered."
-            );
-            System.out.println("You are already registered for this course.");
-            return null;
-        }
-        
-        if (totalCredits + course.getCredits() > 21 ) { 
+        if (blockReason != null) {
             Database.getInstance().addLog(
                 "STUDENT: " + getFullName() +
-                " failed to request registration for course " + course.getName() +
-                " because credit limit was exceeded"
+                        " failed to request registration for course " +
+                        course.getName() +
+                        " because " + blockReason + "."
             );
-            System.out.println("Cannot register: credit limit exceeded.");
-            return null;
-        }
 
-        if (!course.isAvailableFor(this)) {
-            Database.getInstance().addLog(
-                "STUDENT: " + getFullName() + " failed to request registration for course " +
-                        course.getName() + " because course is not intended for student's major/year."
-            );
-            System.out.println("Cannot register: course is not intended for your major/year.");
-            return null;
-        }
+            System.out.println("Cannot register: " + blockReason + ".");
 
-        if (getFailedCoursesCount() >= 3) {
-            Database.getInstance().addLog(
-                "STUDENT: " + getFullName() + " failed to request registration for course " +
-                        course.getName() + " because student has failed 3 or more courses."
-            );
-            System.out.println("Cannot register: student has failed 3 or more courses.");
+            if (blockReason.equals("prerequisites are not passed")) {
+                course.printPrerequisites();
+            }
+
             return null;
         }
 
@@ -86,11 +60,136 @@ public class Student extends User implements Researcher {
 
         return new Registration(this, course);
     }
+
+    public void dropCourse(Course course) {
+        if (course == null) {
+            System.out.println("Course does not exist.");
+            return;
+        }
+
+        if (courses == null || !courses.contains(course)) {
+            System.out.println("You are not registered for this course.");
+            return;
+        }
+
+        if (marks != null && marks.containsKey(course)) {
+            System.out.println("Cannot drop course: mark has already been assigned.");
+
+            Database.getInstance().addLog(
+                    "STUDENT: " + getFullName() +
+                            " failed to drop course " + course.getName() +
+                            " because mark has already been assigned."
+            );
+
+            return;
+        }
+
+        courses.remove(course);
+        totalCredits -= course.getCredits();
+
+        if (totalCredits < 0) {
+            totalCredits = 0;
+        }
+
+        course.removeStudent(this);
+
+        Database.getInstance().addLog(
+                "STUDENT: " + getFullName() +
+                        " dropped course " + course.getName()
+        );
+
+        System.out.println("Course dropped successfully.");
+    }
     
     void addCourse(Course course) {
         if (!courses.contains(course)) {
             courses.add(course);
             totalCredits += course.getCredits();
+        }
+    }
+
+    public String getRegistrationBlockReason(Course course) {
+        if (course == null) {
+            return "course does not exist";
+        }
+
+        if (courses.contains(course)) {
+            return "already registered";
+        }
+
+        if (course.isFull()) {
+            return "course is full";
+        }
+
+        if (totalCredits + course.getCredits() > 21) {
+            return "credit limit exceeded";
+        }
+
+        if (!course.isAvailableFor(this)) {
+            return "course is not intended for student's major/year";
+        }
+
+        if (getFailedCoursesCount() >= 3) {
+            return "student has failed 3 or more courses";
+        }
+
+        if (!hasPassedPrerequisites(course)) {
+            return "prerequisites are not passed";
+        }
+
+        return null;
+    }
+
+    public void viewAvailableCourses(Database database) {
+        if (database == null || database.getCourses().isEmpty()) {
+            System.out.println("No courses found.");
+            return;
+        }
+
+        boolean found = false;
+
+        System.out.println("Available courses for " + getFullName() + ":");
+        System.out.println("--------------------------------");
+
+        for (Course course : database.getCourses()) {
+            String blockReason = getRegistrationBlockReason(course);
+
+            if (blockReason == null) {
+                System.out.println(course);
+                found = true;
+            }
+        }
+
+        if (!found) {
+            System.out.println("No available courses found.");
+        }
+
+        Database.getInstance().addLog(
+                "STUDENT: " + getFullName() + " viewed available courses."
+        );
+    }
+
+    public void viewCoursesWithRegistrationStatus(Database database) {
+        if (database == null || database.getCourses().isEmpty()) {
+            System.out.println("No courses found.");
+            return;
+        }
+
+        System.out.println("Courses and registration availability for " + getFullName() + ":");
+        System.out.println("--------------------------------");
+
+        for (Course course : database.getCourses()) {
+            String blockReason = getRegistrationBlockReason(course);
+
+            System.out.println(course);
+
+            if (blockReason == null) {
+                System.out.println("Status: AVAILABLE");
+            } else {
+                System.out.println("Status: NOT AVAILABLE - " + blockReason);
+            }
+
+            System.out.println("--------------------------------");
         }
     }
 
@@ -159,6 +258,51 @@ public class Student extends User implements Researcher {
         for (Course course : courses) {
             System.out.println(course);
         }
+    }
+
+    public void viewAttendance() {
+        if (courses == null || courses.isEmpty()) {
+            System.out.println("You are not registered for any courses.");
+            return;
+        }
+
+        System.out.println("Attendance of " + getFullName());
+        System.out.println("--------------------------------");
+
+        boolean hasAnyLessons = false;
+
+        for (Course course : courses) {
+            int totalLessons = 0;
+            int attendedLessons = 0;
+
+            for (Lesson lesson : course.getLessons()) {
+                if (lesson.hasStudent(this)) {
+                    totalLessons++;
+                    hasAnyLessons = true;
+
+                    if (lesson.isPresent(this)) {
+                        attendedLessons++;
+                    }
+                }
+            }
+
+            if (totalLessons > 0) {
+                double percentage = (attendedLessons * 100.0) / totalLessons;
+
+                System.out.println("Course: " + course.getName());
+                System.out.println("Attended: " + attendedLessons + "/" + totalLessons);
+                System.out.printf("Attendance: %.2f%%%n", percentage);
+                System.out.println("--------------------------------");
+            }
+        }
+
+        if (!hasAnyLessons) {
+            System.out.println("No lessons found.");
+        }
+
+        Database.getInstance().addLog(
+                "STUDENT: " + getFullName() + " viewed attendance."
+        );
     }
 
     // This method allows the student to view their transcript, which includes all courses and marks
@@ -316,6 +460,74 @@ public class Student extends User implements Researcher {
                 "STUDENT: " + getFullName() +
                     " viewed teacher info for course " + course.getName()
         );
+    }
+
+    public void printStudentDetails() {
+        System.out.println("=== Student Details ===");
+        System.out.println("Full name: " + getFullName());
+        System.out.println("Username: " + getUsername());
+        System.out.println("Year: " + year);
+        System.out.println("Major: " + major);
+        System.out.printf("GPA: %.2f%n", calculateGpa());
+        System.out.println("Total credits: " + totalCredits);
+        System.out.println("Failed courses: " + getFailedCoursesCount());
+
+        System.out.println();
+        System.out.println("Courses:");
+        if (courses == null || courses.isEmpty()) {
+            System.out.println("- No courses");
+        } else {
+            for (Course course : courses) {
+                System.out.println("- " + course.getCode() + " - " + course.getName());
+            }
+        }
+
+        System.out.println();
+        System.out.println("Marks:");
+        if (marks == null || marks.isEmpty()) {
+            System.out.println("- No marks");
+        } else {
+            for (Course course : marks.keySet()) {
+                System.out.println("- " + course.getCode() + " - " + course.getName() + ": " + marks.get(course));
+            }
+        }
+
+        System.out.println();
+        System.out.println("Research:");
+        System.out.println("H-index: " + getHIndex());
+        System.out.println("Research papers: " + getResearchPapers().size());
+        System.out.println("Research projects: " + getResearchProjects().size());
+
+        if (supervisor != null) {
+            User supervisorUser = (User) supervisor;
+            System.out.println("Supervisor: " + supervisorUser.getFullName());
+        } else {
+            System.out.println("Supervisor: not assigned");
+        }
+    }
+
+    public boolean hasPassedCourse(Course course) {
+        if (course == null) {
+            return false;
+        }
+
+        Mark mark = marks.get(course);
+
+        return mark != null && mark.isPassed();
+    }
+
+    public boolean hasPassedPrerequisites(Course course) {
+        if (course == null) {
+            return false;
+        }
+
+        for (Course prerequisite : course.getPrerequisites()) {
+            if (!hasPassedCourse(prerequisite)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public int getYear() {

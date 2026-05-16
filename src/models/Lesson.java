@@ -58,6 +58,20 @@ public class Lesson implements Serializable {
         }
     }
 
+    public void removeStudent(Student student) {
+        if (student == null) {
+            return;
+        }
+
+        if (students != null) {
+            students.remove(student);
+        }
+
+        if (attendance != null) {
+            attendance.remove(student);
+        }
+    }
+
     public void markAttendance(Student student, boolean present) {
         if (student == null) {
             System.out.println("Student does not exist.");
@@ -70,6 +84,18 @@ public class Lesson implements Serializable {
         }
 
         attendance.put(student, present);
+    }
+
+    public boolean hasStudent(Student student) {
+        return students != null && students.contains(student);
+    }
+
+    public boolean isPresent(Student student) {
+        if (attendance == null || student == null) {
+            return false;
+        }
+
+        return attendance.getOrDefault(student, false);
     }
 
     public void printAttendance() {

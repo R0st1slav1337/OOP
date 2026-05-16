@@ -91,6 +91,10 @@ public abstract class User implements Serializable, NewsObserver {
         }
     }
 
+    public String getRoleName() {
+        return getClass().getSimpleName();
+    }
+
     @Override
     public String toString() {
         return fullName + " (" + username + ")";

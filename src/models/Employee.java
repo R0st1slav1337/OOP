@@ -14,6 +14,7 @@ public class Employee extends User {
 
     private List<Complaint> receivedComplaints = new ArrayList<>();
     private List<Complaint> sentComplaints = new ArrayList<>();
+    private List<EmployeeRequest> createdRequests = new ArrayList<>();
 
     private RequestSignerRole signingRole;
 
@@ -215,7 +216,13 @@ public class Employee extends User {
             return null;
         }
 
+        if (createdRequests == null) {
+            createdRequests = new ArrayList<>();
+        }
+
         EmployeeRequest request = new EmployeeRequest(this, title, description);
+        createdRequests.add(request);
+
         Database.getInstance().addEmployeeRequest(request);
 
         Database.getInstance().addLog(
@@ -243,6 +250,63 @@ public class Employee extends User {
             );
 
             System.out.println("Request signed successfully.");
+        }
+    }
+
+    public void viewSentRequests() {
+        if (createdRequests == null || createdRequests.isEmpty()) {
+            System.out.println("No requests created by " + getFullName());
+            return;
+        }
+
+        System.out.println("Requests created by " + getFullName() + ":");
+        System.out.println("--------------------------------");
+
+        for (EmployeeRequest request : createdRequests) {
+            System.out.println(request);
+            System.out.println("--------------------------------");
+        }
+    }
+
+    public List<EmployeeRequest> getCreatedRequests() {
+        if (createdRequests == null) {
+            createdRequests = new ArrayList<>();
+        }
+
+        return createdRequests;
+    }
+
+    public void printEmployeeDetails() {
+        System.out.println("=== Employee Details ===");
+        System.out.println("Full name: " + getFullName());
+        System.out.println("Username: " + getUsername());
+        System.out.println("Department: " + getDepartment());
+        System.out.println("Salary: " + getSalary());
+        System.out.println("Role: " + getRoleName());
+
+        System.out.println();
+        System.out.println("Communication:");
+        System.out.println("Inbox messages: " + (inbox == null ? 0 : inbox.size()));
+        System.out.println("Sent messages: " + (sentMessages == null ? 0 : sentMessages.size()));
+        System.out.println("Received complaints: " + (receivedComplaints == null ? 0 : receivedComplaints.size()));
+        System.out.println("Sent complaints: " + (sentComplaints == null ? 0 : sentComplaints.size()));
+        System.out.println("Sent requests: " + (createdRequests == null ? 0 : createdRequests.size()));
+
+        if (canSignRequests()) {
+            System.out.println("Signing role: " + signingRole);
+        } else {
+            System.out.println("Signing role: none");
+        }
+
+        if (this instanceof Researcher) {
+            Researcher researcher = (Researcher) this;
+
+            System.out.println();
+            System.out.println("Research:");
+            System.out.println("H-index: " + researcher.getHIndex());
+            System.out.println("Research papers: " + researcher.getResearchPapers().size());
+            System.out.println("Research projects: " + researcher.getResearchProjects().size());
+            System.out.println("Total citations: " + researcher.getTotalCitations());
         }
     }
 

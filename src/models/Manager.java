@@ -5,7 +5,6 @@ import enums.RegistrationStatus;
 import enums.RequestStatus;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Manager extends Employee {
@@ -77,6 +76,35 @@ public class Manager extends Employee {
                             " rejected registration of " + student.getFullName() +
                             " for course " + course.getName() +
                             " because student has failed 3 or more courses."
+            );
+
+            return;
+        }
+
+        if (course.isFull()) {
+            System.out.println("Cannot approve: course is full.");
+            registration.reject();
+
+            Database.getInstance().addLog(
+                    "MANAGER: " + getFullName() +
+                        " rejected registration of " + student.getFullName() +
+                        " for course " + course.getName() +
+                        " because course is full."
+            );
+
+            return;
+        }
+
+        if (!student.hasPassedPrerequisites(course)) {
+            System.out.println("Cannot approve: prerequisites are not passed.");
+            course.printPrerequisites();
+            registration.reject();
+
+            Database.getInstance().addLog(
+                    "MANAGER: " + getFullName() +
+                            " rejected registration of " + student.getFullName() +
+                            " for course " + course.getName() +
+                            " because prerequisites are not passed."
             );
 
             return;

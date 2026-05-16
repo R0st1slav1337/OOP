@@ -8,12 +8,21 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+
 public class Demo {
-    private static final String DATA_FILE = "university.ser";
+    private static final String DB_DIR = "databases";
+    private static String currentDataFile;
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        Database database = Database.load(DATA_FILE);
+        Database database = chooseDatabaseOnStart();
 
         boolean running = true;
 
@@ -41,7 +50,7 @@ public class Demo {
 
                     break;
                 case 0:
-                    database.save(DATA_FILE);
+                    database.save(currentDataFile);
                     running = false;
                     System.out.println("Goodbye!");
                     break;
@@ -264,6 +273,12 @@ public class Demo {
             System.out.println("7. View teachers for course");
             System.out.println("8. View news");
             System.out.println("9. Research menu");
+            System.out.println("10. Drop course");
+            System.out.println("11. View attendance");
+            System.out.println("12. View course details");
+            System.out.println("13. View my profile");
+            System.out.println("14. View available courses");
+            System.out.println("15. View all courses with availability status");
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
 
@@ -297,6 +312,24 @@ public class Demo {
                 case 9:
                     researchMenu(database, student, student);
                     break;
+                case 10:
+                    dropCourse(database, student);
+                    break;
+                case 11:
+                    student.viewAttendance();
+                    break;
+                case 12:
+                    viewCourseDetails(database);
+                    break;
+                case 13:
+                    student.printStudentDetails();
+                    break;
+                case 14:
+                    student.viewAvailableCourses(database);
+                    break;
+                case 15:
+                    student.viewCoursesWithRegistrationStatus(database);
+                    break;
                 case 0:
                     loggedIn = false;
                     System.out.println("Logged out.");
@@ -327,6 +360,12 @@ public class Demo {
             System.out.println("11. Create employee request");
             System.out.println("12. View news");
             System.out.println("13. Research menu");
+            System.out.println("14. View attendance report");
+            System.out.println("15. View sent messages");
+            System.out.println("16. View sent complaints");
+            System.out.println("17. View sent requests");
+            System.out.println("18. View course details");
+            System.out.println("19. View my profile");
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
 
@@ -372,6 +411,24 @@ public class Demo {
                 case 13:
                     researchMenu(database, teacher, teacher);
                     break;
+                case 14:
+                    viewAttendanceReport(database, teacher);
+                    break;
+                case 15:
+                    teacher.viewSentMessages();
+                    break;
+                case 16:
+                    teacher.viewSentComplaints();
+                    break;
+                case 17:
+                    teacher.viewSentRequests();
+                    break;
+                case 18:
+                    viewCourseDetails(database);
+                    break;
+                case 19:
+                    teacher.printTeacherDetails();
+                    break;
                 case 0:
                     loggedIn = false;
                     System.out.println("Logged out.");
@@ -407,6 +464,12 @@ public class Demo {
             System.out.println("16. View students sorted by GPA");
             System.out.println("17. View students alphabetically");
             System.out.println("18. View teachers alphabetically");
+            System.out.println("19. Add prerequisite to course");
+            System.out.println("20. View sent messages");
+            System.out.println("21. View sent complaints");
+            System.out.println("22. View sent requests");
+            System.out.println("23. View course details");
+            System.out.println("24. View user details");
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
 
@@ -467,6 +530,24 @@ public class Demo {
                 case 18:
                     manager.viewTeachersAlphabetically(database);
                     break;
+                case 19:
+                    addPrerequisiteToCourse(database);
+                    break;
+                case 20:
+                    manager.viewSentMessages();
+                    break;
+                case 21:
+                    manager.viewSentComplaints();
+                    break;
+                case 22:
+                    manager.viewSentRequests();
+                    break;
+                case 23:
+                    viewCourseDetails(database);
+                    break;
+                case 24:
+                    viewUserDetails(database);
+                    break;
                 case 0:
                     loggedIn = false;
                     System.out.println("Logged out.");
@@ -485,17 +566,23 @@ public class Demo {
             System.out.println();
             System.out.println("=== Admin Menu: " + admin.getFullName() + " ===");
             System.out.println("1. View users");
-            System.out.println("2. Remove user");
-            System.out.println("3. Update username");
-            System.out.println("4. Update password");
-            System.out.println("5. Update full name");
-            System.out.println("6. View logs");
-            System.out.println("7. View inbox");
-            System.out.println("8. Send message to employee");
-            System.out.println("9. Set employee signing role");
-            System.out.println("10. Sign employee request");
-            System.out.println("11. View received complaints");
-            System.out.println("12. Resolve complaint");
+            System.out.println("2. Add user");
+            System.out.println("3. Remove user");
+            System.out.println("4. Update username");
+            System.out.println("5. Update password");
+            System.out.println("6. Update full name");
+            System.out.println("7. View logs");
+            System.out.println("8. View inbox");
+            System.out.println("9. Send message to employee");
+            System.out.println("10. Set employee signing role");
+            System.out.println("11. Sign employee request");
+            System.out.println("12. View received complaints");
+            System.out.println("13. Resolve complaint");
+            System.out.println("14. View sent messages");
+            System.out.println("15. View sent complaints");
+            System.out.println("16. View sent requests");
+            System.out.println("17. View course details");
+            System.out.println("18. View user details");
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
 
@@ -506,37 +593,55 @@ public class Demo {
                     admin.viewUsers(database);
                     break;
                 case 2:
-                    removeUser(database, admin);
+                    adminAddUser(database, admin);
                     break;
                 case 3:
-                    updateUsername(database, admin);
+                    removeUser(database, admin);
                     break;
                 case 4:
-                    updatePassword(database, admin);
+                    updateUsername(database, admin);
                     break;
                 case 5:
-                    updateFullName(database, admin);
+                    updatePassword(database, admin);
                     break;
                 case 6:
-                    admin.viewLogs(database);
+                    updateFullName(database, admin);
                     break;
                 case 7:
-                    admin.viewInbox();
+                    admin.viewLogs(database);
                     break;
                 case 8:
-                    sendEmployeeMessage(database, admin);
+                    admin.viewInbox();
                     break;
                 case 9:
-                    setSigningRole(database);
+                    sendEmployeeMessage(database, admin);
                     break;
                 case 10:
-                    signEmployeeRequest(database, admin);
+                    setSigningRole(database);
                     break;
                 case 11:
-                    admin.viewReceivedComplaints();
+                    signEmployeeRequest(database, admin);
                     break;
                 case 12:
+                    admin.viewReceivedComplaints();
+                    break;
+                case 13:
                     resolveComplaint(admin);
+                    break;
+                case 14:
+                    admin.viewSentMessages();
+                    break;
+                case 15:
+                    admin.viewSentComplaints();
+                    break;
+                case 16:
+                    admin.viewSentRequests();
+                    break;
+                case 17:
+                    viewCourseDetails(database);
+                    break;
+                case 18:
+                    viewUserDetails(database);
                     break;
                 case 0:
                     loggedIn = false;
@@ -556,14 +661,19 @@ public class Demo {
             System.out.println();
             System.out.println("=== Employee Menu: " + employee.getFullName() + " ===");
             System.out.println("1. View inbox");
-            System.out.println("2. Send message to employee");
-            System.out.println("3. Send complaint");
-            System.out.println("4. Create employee request");
-            System.out.println("5. View news");
+            System.out.println("2. View sent messages");
+            System.out.println("3. Send message to employee");
+            System.out.println("4. Send complaint");
+            System.out.println("5. View sent complaints");
+            System.out.println("6. Create employee request");
+            System.out.println("7. View sent requests");
+            System.out.println("8. View news");
+            System.out.println("9. View my profile");
 
             if (employee instanceof Researcher) {
-                System.out.println("6. Research menu");
+                System.out.println("10. Research menu");
             }
+            
 
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
@@ -575,18 +685,30 @@ public class Demo {
                     employee.viewInbox();
                     break;
                 case 2:
-                    sendEmployeeMessage(database, employee);
+                    employee.viewSentMessages();
                     break;
                 case 3:
-                    sendEmployeeComplaint(database, employee);
+                    sendEmployeeMessage(database, employee);
                     break;
                 case 4:
-                    createEmployeeRequest(employee);
+                    sendEmployeeComplaint(database, employee);
                     break;
                 case 5:
-                    employee.viewNews();
+                    employee.viewSentComplaints();
                     break;
                 case 6:
+                    createEmployeeRequest(employee);
+                    break;
+                case 7:
+                    employee.viewSentRequests();
+                    break;
+                case 8:
+                    employee.viewNews();
+                    break;
+                case 9:
+                    employee.printEmployeeDetails();
+                    break;
+                case 10:
                     if (employee instanceof Researcher) {
                         researchMenu(database, employee, (Researcher) employee);
                     } else {
@@ -618,6 +740,8 @@ public class Demo {
             System.out.println("6. Join research project");
             System.out.println("7. View my research projects");
             System.out.println("8. Show all university papers by citations");
+            System.out.println("9. Add my paper to research project");
+            System.out.println("10. View project papers");
             System.out.println("0. Back");
             System.out.print("Choose option: ");
 
@@ -647,6 +771,12 @@ public class Demo {
                     break;
                 case 8:
                     database.printAllResearchPapers(ResearchPaperComparators.BY_CITATIONS);
+                    break;
+                case 9:
+                    addPaperToResearchProject(database, user, researcher);
+                    break;
+                case 10:
+                    viewProjectPapers(database);
                     break;
                 case 0:
                     inResearchMenu = false;
@@ -691,6 +821,23 @@ public class Demo {
         teacher.viewStudentsForCourse(course);
     }
 
+    // Helper method for viewing attendance report for a course by teacher with course selection and attendance report display
+    private static void viewAttendanceReport(Database database, Teacher teacher) {
+        printCourses(database);
+
+        System.out.print("Course code: ");
+        String code = readLine();
+
+        Course course = database.findCourseByCode(code);
+
+        if (course == null) {
+            System.out.println("Course not found.");
+            return;
+        }
+
+        teacher.viewAttendanceReport(course);
+    }
+
     // Helper method for requesting course registration by student with course selection and registration creation
     private static void requestCourseRegistration(Database database, Student student) {
         printCourses(database);
@@ -711,6 +858,23 @@ public class Demo {
             database.addRegistration(registration);
             System.out.println("Registration request was created. Wait for manager approval.");
         }
+    }
+
+    // Helper method to drop a course by student with course selection and dropping the course
+    private static void dropCourse(Database database, Student student) {
+        student.viewCourses();
+
+        System.out.print("Course code to drop: ");
+        String code = readLine();
+
+        Course course = database.findCourseByCode(code);
+
+        if (course == null) {
+            System.out.println("Course not found.");
+            return;
+        }
+
+        student.dropCourse(course);
     }
 
     // Helper method for processing registration requests by manager with pending registrations display, selection, and approval/rejection
@@ -763,7 +927,10 @@ public class Demo {
         System.out.print("Intended year (0 for ALL): ");
         int intendedYear = readInt();
 
-        Course course = new Course(code, name, credits, intendedMajor, intendedYear);
+        System.out.print("Capacity: ");
+        int capacity = readInt();
+
+        Course course = new Course(code, name, credits, intendedMajor, intendedYear, capacity);
         database.addCourse(course);
 
         System.out.println("Course added successfully.");
@@ -960,6 +1127,27 @@ public class Demo {
         }
     }
 
+    // Helper method for viewing course details by student with course selection and course details display
+    private static void viewCourseDetails(Database database) {
+        printCourses(database);
+
+        System.out.print("Course code: ");
+        String code = readLine();
+
+        Course course = database.findCourseByCode(code);
+
+        if (course == null) {
+            System.out.println("Course not found.");
+            return;
+        }
+
+        course.printCourseDetails();
+
+        Database.getInstance().addLog(
+                "SYSTEM: course details viewed for " + course.getCode()
+        );
+    }
+
     // Helper method for removing a user by admin with username input, user selection, confirmation, and user removal
     private static void removeUser(Database database, Admin admin) {
         System.out.print("Username to remove: ");
@@ -987,6 +1175,160 @@ public class Demo {
 
         admin.removeUser(database, user);
         System.out.println("User removed successfully.");
+    }
+
+    private static void adminAddUser(Database database, Admin admin) {
+        System.out.println();
+        System.out.println("=== Admin Add User ===");
+
+        System.out.print("Username: ");
+        String username = readLine();
+
+        if (database.isUsernameTaken(username)) {
+            System.out.println("Username is already taken.");
+            return;
+        }
+
+        System.out.print("Password: ");
+        String password = readLine();
+
+        System.out.print("Full name: ");
+        String fullName = readLine();
+
+        UserType userType = readEnum(UserType.class, "Choose user type");
+
+        String id = userType.name().charAt(0) + String.valueOf(System.currentTimeMillis());
+
+        User user;
+
+        switch (userType) {
+            case STUDENT:
+                System.out.print("Year: ");
+                int year = readInt();
+
+                System.out.print("Major: ");
+                String major = readLine();
+
+                System.out.print("H-index: ");
+                int studentHIndex = readInt();
+
+                user = UserFactory.createStudent(
+                        id,
+                        username,
+                        password,
+                        fullName,
+                        year,
+                        major,
+                        studentHIndex
+                );
+                break;
+
+            case TEACHER:
+                System.out.print("Salary: ");
+                double teacherSalary = readDouble();
+
+                System.out.print("Department: ");
+                String teacherDepartment = readLine();
+
+                TeacherTitle title = readEnum(TeacherTitle.class, "Choose teacher title");
+
+                System.out.print("H-index: ");
+                int teacherHIndex = readInt();
+
+                user = UserFactory.createTeacher(
+                        id,
+                        username,
+                        password,
+                        fullName,
+                        teacherSalary,
+                        teacherDepartment,
+                        title,
+                        teacherHIndex
+                );
+                break;
+
+            case MANAGER:
+                System.out.print("Salary: ");
+                double managerSalary = readDouble();
+
+                System.out.print("Department: ");
+                String managerDepartment = readLine();
+
+                ManagerType managerType = readEnum(ManagerType.class, "Choose manager type");
+
+                user = UserFactory.createManager(
+                        id,
+                        username,
+                        password,
+                        fullName,
+                        managerSalary,
+                        managerDepartment,
+                        managerType
+                );
+                break;
+
+            case ADMIN:
+                System.out.print("Salary: ");
+                double adminSalary = readDouble();
+
+                System.out.print("Department: ");
+                String adminDepartment = readLine();
+
+                user = UserFactory.createAdmin(
+                        id,
+                        username,
+                        password,
+                        fullName,
+                        adminSalary,
+                        adminDepartment
+                );
+                break;
+
+            case EMPLOYEE:
+                System.out.print("Salary: ");
+                double employeeSalary = readDouble();
+
+                System.out.print("Department: ");
+                String employeeDepartment = readLine();
+
+                user = UserFactory.createEmployee(
+                        id,
+                        username,
+                        password,
+                        fullName,
+                        employeeSalary,
+                        employeeDepartment
+                );
+                break;
+
+            case RESEARCH_EMPLOYEE:
+                System.out.print("Salary: ");
+                double researchEmployeeSalary = readDouble();
+
+                System.out.print("Department: ");
+                String researchEmployeeDepartment = readLine();
+
+                System.out.print("H-index: ");
+                int researchEmployeeHIndex = readInt();
+
+                user = UserFactory.createResearchEmployee(
+                        id,
+                        username,
+                        password,
+                        fullName,
+                        researchEmployeeSalary,
+                        researchEmployeeDepartment,
+                        researchEmployeeHIndex
+                );
+                break;
+
+            default:
+                System.out.println("Unknown user type.");
+                return;
+        }
+
+        admin.addUser(database, user);
+        System.out.println("User was added successfully by admin.");
     }
 
     // Helper method for resolving a complaint by admin with received complaints display, selection, and complaint resolution
@@ -1060,6 +1402,55 @@ public class Demo {
         System.out.println("Research paper added successfully.");
     }
 
+    // Helper method for adding a research paper to a research project by researcher with project selection, paper selection, and adding the paper to the project
+    private static void addPaperToResearchProject(Database database, User user, Researcher researcher) {
+        List<ResearchProject> projects = database.getResearchProjects();
+
+        if (projects == null || projects.isEmpty()) {
+            System.out.println("No research projects found.");
+            return;
+        }
+
+        List<ResearchPaper> papers = researcher.getResearchPapers();
+
+        if (papers == null || papers.isEmpty()) {
+            System.out.println("You have no research papers.");
+            return;
+        }
+
+        System.out.println("Research projects:");
+        for (int i = 0; i < projects.size(); i++) {
+            System.out.println((i + 1) + ". " + projects.get(i).getTopic());
+        }
+
+        System.out.print("Choose project number: ");
+        int projectIndex = readInt() - 1;
+
+        if (projectIndex < 0 || projectIndex >= projects.size()) {
+            System.out.println("Wrong project number.");
+            return;
+        }
+
+        ResearchProject project = projects.get(projectIndex);
+
+        System.out.println("Your papers:");
+        for (int i = 0; i < papers.size(); i++) {
+            System.out.println((i + 1) + ". " + papers.get(i).getTitle());
+        }
+
+        System.out.print("Choose paper number: ");
+        int paperIndex = readInt() - 1;
+
+        if (paperIndex < 0 || paperIndex >= papers.size()) {
+            System.out.println("Wrong paper number.");
+            return;
+        }
+
+        ResearchPaper paper = papers.get(paperIndex);
+
+        project.addPaper(researcher, paper);
+    }
+
     // Helper method for creating a research project by researcher with project topic input, project creation, and joining the project
     private static void createResearchProject(Database database, User user, Researcher researcher) {
         System.out.print("Project topic: ");
@@ -1128,6 +1519,31 @@ public class Demo {
         }
     }
 
+    // Helper method for viewing papers of a research project by researcher with project selection and papers display
+    private static void viewProjectPapers(Database database) {
+        List<ResearchProject> projects = database.getResearchProjects();
+
+        if (projects == null || projects.isEmpty()) {
+            System.out.println("No research projects found.");
+            return;
+        }
+
+        System.out.println("Research projects:");
+        for (int i = 0; i < projects.size(); i++) {
+            System.out.println((i + 1) + ". " + projects.get(i).getTopic());
+        }
+
+        System.out.print("Choose project number: ");
+        int index = readInt() - 1;
+
+        if (index < 0 || index >= projects.size()) {
+            System.out.println("Wrong project number.");
+            return;
+        }
+
+        projects.get(index).printPublishedPapers();
+    }
+
     // Helper method for creating news by manager with news details input and news creation
     private static void createNews(Manager manager) {
         System.out.print("News title: ");
@@ -1154,6 +1570,41 @@ public class Demo {
         }
 
         manager.generateReport(new CoursePerformanceReport(course));
+    }
+
+    // Helper method for adding a prerequisite to a course by manager with course and prerequisite selection
+    private static void addPrerequisiteToCourse(Database database) {
+        printCourses(database);
+
+        System.out.print("Course code: ");
+        String courseCode = readLine();
+
+        Course course = database.findCourseByCode(courseCode);
+
+        if (course == null) {
+            System.out.println("Course not found.");
+            return;
+        }
+
+        System.out.print("Prerequisite course code: ");
+        String prerequisiteCode = readLine();
+
+        Course prerequisite = database.findCourseByCode(prerequisiteCode);
+
+        if (prerequisite == null) {
+            System.out.println("Prerequisite course not found.");
+            return;
+        }
+
+        course.addPrerequisite(prerequisite);
+
+        Database.getInstance().addLog(
+                "MANAGER: added prerequisite " +
+                        prerequisite.getCode() +
+                        " to course " + course.getCode()
+        );
+
+        System.out.println("Prerequisite added successfully.");
     }
 
     // Helper method for showing top cited researcher by year with year input and top cited researcher display
@@ -1362,6 +1813,136 @@ public class Demo {
         for (Course course : courses) {
             System.out.println(course);
         }
+    }
+
+    // Helper method for viewing user details by username with user selection and user details display
+    private static void viewUserDetails(Database database) {
+        System.out.print("Username: ");
+        String username = readLine();
+
+        User user = database.findUserByUsername(username);
+
+        if (user == null) {
+            System.out.println("User not found.");
+            return;
+        }
+
+        if (user instanceof Student) {
+            ((Student) user).printStudentDetails();
+        } else if (user instanceof Teacher) {
+            ((Teacher) user).printTeacherDetails();
+        } else if (user instanceof Employee) {
+            ((Employee) user).printEmployeeDetails();
+        } else {
+            System.out.println("=== User Details ===");
+            System.out.println("Full name: " + user.getFullName());
+            System.out.println("Username: " + user.getUsername());
+            System.out.println("Role: " + user.getRoleName());
+        }
+
+        Database.getInstance().addLog(
+                "SYSTEM: user details viewed for " + user.getUsername()
+        );
+    }
+
+    // Helper method for choosing a database file on application start with database files display, selection, and database loading/creation
+    private static Database chooseDatabaseOnStart() {
+        while (true) {
+            java.util.List<Path> files = getDatabaseFiles();
+
+            System.out.println();
+            System.out.println("=== Database Selection ===");
+
+            if (files.isEmpty()) {
+                System.out.println("No saved databases found.");
+            } else {
+                System.out.println("Saved databases:");
+
+                for (int i = 0; i < files.size(); i++) {
+                    System.out.println((i + 1) + ". " + files.get(i).getFileName());
+                }
+            }
+
+            System.out.println((files.size() + 1) + ". Create new database");
+            System.out.println("0. Exit");
+            System.out.print("Choose option: ");
+
+            int choice = readInt();
+
+            if (choice == 0) {
+                System.out.println("Goodbye!");
+                System.exit(0);
+            }
+
+            if (choice >= 1 && choice <= files.size()) {
+                Path selectedFile = files.get(choice - 1);
+
+                Database database = Database.tryLoad(selectedFile.toString());
+
+                if (database != null) {
+                    currentDataFile = selectedFile.toString();
+                    return database;
+                }
+
+                System.out.println();
+                System.out.println("This database could not be loaded.");
+                System.out.println("It was NOT overwritten.");
+                System.out.println("Choose another database or create a new one.");
+                continue;
+            }
+
+            if (choice == files.size() + 1) {
+                currentDataFile = createNewDatabaseFileName();
+
+                Database database = Database.createNew();
+
+                System.out.println("New database was created.");
+                System.out.println("It will be saved to: " + currentDataFile);
+
+                return database;
+            }
+
+            System.out.println("Wrong option.");
+        }
+    }
+
+    // Helper method for getting a list of database files from the database directory with .ser extension and sorting by name in descending order
+    private static java.util.List<Path> getDatabaseFiles() {
+        java.util.List<Path> files = new ArrayList<>();
+
+        try {
+            Path dir = Paths.get(DB_DIR);
+            Files.createDirectories(dir);
+
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.ser")) {
+                for (Path path : stream) {
+                    files.add(path);
+                }
+            }
+
+            files.sort((p1, p2) ->
+                    p2.getFileName().toString().compareToIgnoreCase(p1.getFileName().toString())
+            );
+
+        } catch (IOException e) {
+            System.out.println("Could not read database directory: " + e.getMessage());
+        }
+
+        return files;
+    }
+
+    // Helper method for creating a new database file name with timestamp and ensuring the database directory exists
+    private static String createNewDatabaseFileName() {
+        try {
+            Files.createDirectories(Paths.get(DB_DIR));
+        } catch (IOException e) {
+            System.out.println("Could not create database directory: " + e.getMessage());
+        }
+
+        String timestamp = java.time.LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+
+        return DB_DIR + "/university_" + timestamp + ".ser";
     }
 
     // Helper method for reading a line of input from the user with trimming
