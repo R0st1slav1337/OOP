@@ -50,7 +50,11 @@ public class Demo {
 
                     break;
                 case 0:
-                    database.save(currentDataFile);
+                    if (currentDataFile != null) {
+                        database.save(currentDataFile);
+                    } else {
+                        System.out.println("No database file selected. Database was not saved.");
+                    }
                     running = false;
                     System.out.println("Goodbye!");
                     break;
@@ -259,8 +263,6 @@ public class Demo {
             managerMenu(database, (Manager) user);
         } else if (user instanceof Teacher) {
             teacherMenu(database, (Teacher) user);
-        } else if (user instanceof ResearchEmployee) {
-            employeeMenu(database, (Employee) user);
         } else if (user instanceof Employee) {
             employeeMenu(database, (Employee) user);
         } else {
@@ -884,15 +886,9 @@ public class Demo {
     // Helper method for viewing teachers for a course by student with course
     // selection and teachers display
     private static void viewTeachersForCourse(Database database, Student student) {
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
@@ -902,15 +898,9 @@ public class Demo {
     // Helper method for viewing students for a course by teacher with course
     // selection and students display
     private static void viewStudentsForCourse(Database database, Teacher teacher) {
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
@@ -920,15 +910,9 @@ public class Demo {
     // Helper method for viewing attendance report for a course by teacher with
     // course selection and attendance report display
     private static void viewAttendanceReport(Database database, Teacher teacher) {
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
@@ -938,15 +922,9 @@ public class Demo {
     // Helper method for requesting course registration by student with course
     // selection and registration creation
     private static void requestCourseRegistration(Database database, Student student) {
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
@@ -961,6 +939,7 @@ public class Demo {
     // Helper method to drop a course by student with course selection and dropping
     // the course
     private static void dropCourse(Database database, Student student) {
+        System.out.println("Your courses:");
         student.viewCourses();
 
         System.out.print("Course code to drop: ");
@@ -1040,29 +1019,19 @@ public class Demo {
     // Helper method for assigning a teacher to a course by manager with course
     // selection, teacher selection, and assignment
     private static void assignTeacher(Database database, Manager manager) {
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
-        System.out.print("Teacher username: ");
-        String username = readLine();
+        Teacher teacher = selectTeacher(database);
 
-        User user = database.findUserByUsername(username);
-
-        if (!(user instanceof Teacher)) {
-            System.out.println("Teacher not found.");
+        if (teacher == null) {
             return;
         }
 
-        manager.assignTeacher(course, (Teacher) user);
+        manager.assignTeacher(course, teacher);
 
         System.out.println("Teacher assigned successfully.");
     }
@@ -1070,25 +1039,15 @@ public class Demo {
     // Helper method for putting a mark for a student by teacher with student
     // selection, course selection, and mark input
     private static void putMark(Database database, Teacher teacher) {
-        System.out.print("Student username: ");
-        String username = readLine();
+        Student student = selectStudent(database);
 
-        User user = database.findUserByUsername(username);
-
-        if (!(user instanceof Student)) {
-            System.out.println("Student not found.");
+        if (student == null) {
             return;
         }
 
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
@@ -1103,7 +1062,7 @@ public class Demo {
 
         try {
             Mark mark = new Mark(first, second, finalExam);
-            teacher.putMark((Student) user, course, mark);
+            teacher.putMark(student, course, mark);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
@@ -1112,15 +1071,9 @@ public class Demo {
     // Helper method for creating a lesson by teacher with course selection, lesson
     // details input, and lesson creation
     private static void createLesson(Database database, Teacher teacher) {
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
@@ -1140,15 +1093,9 @@ public class Demo {
     // Helper method for marking attendance for a lesson by teacher with course
     // selection, lesson selection, student selection, and attendance marking
     private static void markAttendance(Database database, Teacher teacher) {
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
@@ -1174,13 +1121,9 @@ public class Demo {
 
         Lesson lesson = lessons.get(lessonIndex);
 
-        System.out.print("Student username: ");
-        String username = readLine();
+        Student student = selectStudent(database);
 
-        User user = database.findUserByUsername(username);
-
-        if (!(user instanceof Student)) {
-            System.out.println("Student not found.");
+        if (student == null) {
             return;
         }
 
@@ -1191,7 +1134,7 @@ public class Demo {
                 || answer.equalsIgnoreCase("y")
                 || answer.equalsIgnoreCase("true");
 
-        teacher.markAttendance(lesson, (Student) user, present);
+        teacher.markAttendance(lesson, student, present);
 
         System.out.println();
         lesson.printAttendance();
@@ -1200,23 +1143,15 @@ public class Demo {
     // Helper method for rating a teacher by student with teacher selection, course
     // selection, and rating input
     private static void rateTeacher(Database database, Student student) {
-        System.out.print("Teacher username: ");
-        String username = readLine();
+        Teacher teacher = selectTeacher(database);
 
-        User user = database.findUserByUsername(username);
-
-        if (!(user instanceof Teacher)) {
-            System.out.println("Teacher not found.");
+        if (teacher == null) {
             return;
         }
 
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
@@ -1227,7 +1162,7 @@ public class Demo {
         String comment = readLine();
 
         try {
-            student.rateTeacher((Teacher) user, course, rating, comment);
+            student.rateTeacher(teacher, course, rating, comment);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
@@ -1236,22 +1171,17 @@ public class Demo {
     // Helper method for viewing course details by student with course selection and
     // course details display
     private static void viewCourseDetails(Database database) {
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
         course.printCourseDetails();
 
         Database.getInstance().addLog(
-                "SYSTEM: course details viewed for " + course.getCode());
+                "SYSTEM: course details viewed for " + course.getCode()
+        );
     }
 
     // Helper method for removing a user by admin with username input, user
@@ -1384,10 +1314,9 @@ public class Demo {
     // Helper method for adding a research paper to a research project by researcher
     // with project selection, paper selection, and adding the paper to the project
     private static void addPaperToResearchProject(Database database, User user, Researcher researcher) {
-        List<ResearchProject> projects = database.getResearchProjects();
+        ResearchProject project = selectResearchProject(database);
 
-        if (projects == null || projects.isEmpty()) {
-            System.out.println("No research projects found.");
+        if (project == null) {
             return;
         }
 
@@ -1398,22 +1327,8 @@ public class Demo {
             return;
         }
 
-        System.out.println("Research projects:");
-        for (int i = 0; i < projects.size(); i++) {
-            System.out.println((i + 1) + ". " + projects.get(i).getTopic());
-        }
-
-        System.out.print("Choose project number: ");
-        int projectIndex = readInt() - 1;
-
-        if (projectIndex < 0 || projectIndex >= projects.size()) {
-            System.out.println("Wrong project number.");
-            return;
-        }
-
-        ResearchProject project = projects.get(projectIndex);
-
         System.out.println("Your papers:");
+
         for (int i = 0; i < papers.size(); i++) {
             System.out.println((i + 1) + ". " + papers.get(i).getTitle());
         }
@@ -1456,28 +1371,14 @@ public class Demo {
     // Helper method for joining a research project by researcher with project
     // selection and joining the project
     private static void joinResearchProject(Database database, User user, Researcher researcher) {
-        List<ResearchProject> projects = database.getResearchProjects();
+        ResearchProject project = selectResearchProject(database);
 
-        if (projects == null || projects.isEmpty()) {
-            System.out.println("No research projects found.");
-            return;
-        }
-
-        System.out.println("Research projects:");
-        for (int i = 0; i < projects.size(); i++) {
-            System.out.println((i + 1) + ". " + projects.get(i).getTopic());
-        }
-
-        System.out.print("Choose project number: ");
-        int index = readInt() - 1;
-
-        if (index < 0 || index >= projects.size()) {
-            System.out.println("Wrong project number.");
+        if (project == null) {
             return;
         }
 
         try {
-            researcher.joinProject(projects.get(index));
+            researcher.joinProject(project);
             System.out.println("Joined research project successfully.");
         } catch (NotResearcherException e) {
             System.out.println(e.getMessage());
@@ -1505,27 +1406,13 @@ public class Demo {
     // Helper method for viewing papers of a research project by researcher with
     // project selection and papers display
     private static void viewProjectPapers(Database database) {
-        List<ResearchProject> projects = database.getResearchProjects();
+        ResearchProject project = selectResearchProject(database);
 
-        if (projects == null || projects.isEmpty()) {
-            System.out.println("No research projects found.");
+        if (project == null) {
             return;
         }
 
-        System.out.println("Research projects:");
-        for (int i = 0; i < projects.size(); i++) {
-            System.out.println((i + 1) + ". " + projects.get(i).getTopic());
-        }
-
-        System.out.print("Choose project number: ");
-        int index = readInt() - 1;
-
-        if (index < 0 || index >= projects.size()) {
-            System.out.println("Wrong project number.");
-            return;
-        }
-
-        projects.get(index).printPublishedPapers();
+        project.printPublishedPapers();
     }
 
     // Helper method for creating news by manager with news details input and news
@@ -1543,15 +1430,9 @@ public class Demo {
     // Helper method for generating a course report by manager with course selection
     // and report generation
     private static void generateCourseReport(Database database, Manager manager) {
-        printCourses(database);
-
-        System.out.print("Course code: ");
-        String code = readLine();
-
-        Course course = database.findCourseByCode(code);
+        Course course = selectCourse(database);
 
         if (course == null) {
-            System.out.println("Course not found.");
             return;
         }
 
@@ -1605,32 +1486,24 @@ public class Demo {
     // Helper method for sending a message to another employee by employee with
     // recipient selection, message text input, and message sending
     private static void sendEmployeeMessage(Database database, Employee sender) {
-        System.out.print("Recipient username: ");
-        String username = readLine();
+        Employee recipient = selectEmployee(database);
 
-        User user = database.findUserByUsername(username);
-
-        if (!(user instanceof Employee)) {
-            System.out.println("Employee not found.");
+        if (recipient == null) {
             return;
         }
 
         System.out.print("Message text: ");
         String text = readLine();
 
-        sender.sendMessage((Employee) user, text);
-    }
+        sender.sendMessage(recipient, text);
+        }
 
     // Helper method for sending a complaint to another employee by employee with
     // recipient selection, complaint details input, and complaint sending
     private static void sendEmployeeComplaint(Database database, Employee sender) {
-        System.out.print("Recipient username: ");
-        String username = readLine();
+        Employee recipient = selectEmployee(database);
 
-        User user = database.findUserByUsername(username);
-
-        if (!(user instanceof Employee)) {
-            System.out.println("Employee not found.");
+        if (recipient == null) {
             return;
         }
 
@@ -1640,7 +1513,7 @@ public class Demo {
         System.out.print("Complaint description: ");
         String description = readLine();
 
-        sender.sendComplaint((Employee) user, subject, description);
+        sender.sendComplaint(recipient, subject, description);
     }
 
     // Helper method for creating an employee request by employee with request
@@ -1811,9 +1684,25 @@ public class Demo {
         }
     }
 
-    // Helper method for viewing user details by username with user selection and
-    // user details display
-    private static void viewUserDetails(Database database) {
+    // ===== Selection helpers =====
+
+    private static Course selectCourse(Database database) {
+        printCourses(database);
+
+        System.out.print("Course code: ");
+        String code = readLine();
+
+        Course course = database.findCourseByCode(code);
+
+        if (course == null) {
+            System.out.println("Course not found.");
+            return null;
+        }
+
+        return course;
+    }
+
+    private static User selectUser(Database database) {
         System.out.print("Username: ");
         String username = readLine();
 
@@ -1821,6 +1710,85 @@ public class Demo {
 
         if (user == null) {
             System.out.println("User not found.");
+            return null;
+        }
+
+        return user;
+    }
+
+    private static Student selectStudent(Database database) {
+        System.out.print("Student username: ");
+        String username = readLine();
+
+        User user = database.findUserByUsername(username);
+
+        if (!(user instanceof Student)) {
+            System.out.println("Student not found.");
+            return null;
+        }
+
+        return (Student) user;
+    }
+
+    private static Teacher selectTeacher(Database database) {
+        System.out.print("Teacher username: ");
+        String username = readLine();
+
+        User user = database.findUserByUsername(username);
+
+        if (!(user instanceof Teacher)) {
+            System.out.println("Teacher not found.");
+            return null;
+        }
+
+        return (Teacher) user;
+    }
+
+    private static Employee selectEmployee(Database database) {
+        System.out.print("Employee username: ");
+        String username = readLine();
+
+        User user = database.findUserByUsername(username);
+
+        if (!(user instanceof Employee)) {
+            System.out.println("Employee not found.");
+            return null;
+        }
+
+        return (Employee) user;
+    }
+
+    private static ResearchProject selectResearchProject(Database database) {
+        List<ResearchProject> projects = database.getResearchProjects();
+
+        if (projects == null || projects.isEmpty()) {
+            System.out.println("No research projects found.");
+            return null;
+        }
+
+        System.out.println("Research projects:");
+
+        for (int i = 0; i < projects.size(); i++) {
+            System.out.println((i + 1) + ". " + projects.get(i).getTopic());
+        }
+
+        System.out.print("Choose project number: ");
+        int index = readInt() - 1;
+
+        if (index < 0 || index >= projects.size()) {
+            System.out.println("Wrong project number.");
+            return null;
+        }
+
+        return projects.get(index);
+    }
+
+    // Helper method for viewing user details by username with user selection and
+    // user details display
+    private static void viewUserDetails(Database database) {
+        User user = selectUser(database);
+
+        if (user == null) {
             return;
         }
 
@@ -1838,7 +1806,8 @@ public class Demo {
         }
 
         Database.getInstance().addLog(
-                "SYSTEM: user details viewed for " + user.getUsername());
+                "SYSTEM: user details viewed for " + user.getUsername()
+        );
     }
 
     // Helper method for choosing a database file on application start with database
