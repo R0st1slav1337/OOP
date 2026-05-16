@@ -264,10 +264,6 @@ public class Course implements Serializable {
         return prerequisites;
     }
 
-    public boolean hasPrerequisites() {
-        return prerequisites != null && !prerequisites.isEmpty();
-    }
-
     public void printPrerequisites() {
         if (prerequisites == null || prerequisites.isEmpty()) {
             System.out.println("No prerequisites for course " + name);

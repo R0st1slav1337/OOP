@@ -29,18 +29,6 @@ public class ResearchProject implements Serializable {
         }
     }
 
-    public boolean hasParticipant(Researcher researcher) {
-        if (researcher == null) {
-            return false;
-        }
-
-        if (participants == null) {
-            participants = new ArrayList<>();
-        }
-
-        return participants.contains(researcher);
-    }
-
     public void addPaper(Researcher researcher, ResearchPaper paper) {
         if (researcher == null) {
             System.out.println("Researcher does not exist.");
