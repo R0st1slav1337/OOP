@@ -648,27 +648,29 @@ public class Demo {
             System.out.println();
             System.out.println("--- Logs & System ---");
             System.out.println("7. View logs");
-            System.out.println("8. View database summary");
+            System.out.println("8. View all news");
+            System.out.println("9. View database summary");
             System.out.println();
             System.out.println("--- Communication ---");
-            System.out.println("9. View inbox");
-            System.out.println("10. View sent messages");
-            System.out.println("11. Send message to employee");
+            System.out.println("10. View inbox");
+            System.out.println("11. View sent messages");
+            System.out.println("12. Send message to employee");
             System.out.println();
             System.out.println("--- Complaints ---");
-            System.out.println("12. View received complaints");
-            System.out.println("13. Resolve complaint");
-            System.out.println("14. View sent complaints");
+            System.out.println("13. View received complaints");
+            System.out.println("14. Resolve complaint");
+            System.out.println("15. View sent complaints");
             System.out.println();
             System.out.println("--- Requests ---");
-            System.out.println("15. Set employee signing role");
-            System.out.println("16. Sign employee request");
-            System.out.println("17. View sent requests");
+            System.out.println("16. View all employee requests");
+            System.out.println("17. Set employee signing role");
+            System.out.println("18. Sign employee request");
+            System.out.println("19. View sent requests");
             System.out.println();
             System.out.println("--- Search / Profile ---");
-            System.out.println("18. View user details");
-            System.out.println("19. View course details");
-            System.out.println("20. View my profile");
+            System.out.println("20. View user details");
+            System.out.println("21. View course details");
+            System.out.println("22. View my profile");
             System.out.println();
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
@@ -698,42 +700,48 @@ public class Demo {
                     admin.viewLogs(database);
                     break;
                 case 8:
-                    database.printDatabaseSummary();
+                    database.printAllNews();
                     break;
                 case 9:
-                    admin.viewInbox();
+                    database.printDatabaseSummary();
                     break;
                 case 10:
-                    admin.viewSentMessages();
+                    admin.viewInbox();
                     break;
                 case 11:
-                    sendEmployeeMessage(database, admin);
+                    admin.viewSentMessages();
                     break;
                 case 12:
-                    admin.viewReceivedComplaints();
+                    sendEmployeeMessage(database, admin);
                     break;
                 case 13:
-                    resolveComplaint(admin);
+                    admin.viewReceivedComplaints();
                     break;
                 case 14:
-                    admin.viewSentComplaints();
+                    resolveComplaint(admin);
                     break;
                 case 15:
-                    setSigningRole(database);
+                    admin.viewSentComplaints();
                     break;
                 case 16:
-                    signEmployeeRequest(database, admin);
+                    database.printAllEmployeeRequests();
                     break;
                 case 17:
-                    admin.viewSentRequests();
+                    setSigningRole(database);
                     break;
                 case 18:
-                    viewUserDetails(database);
+                    signEmployeeRequest(database, admin);
                     break;
                 case 19:
-                    viewCourseDetails(database);
+                    admin.viewSentRequests();
                     break;
                 case 20:
+                    viewUserDetails(database);
+                    break;
+                case 21:
+                    viewCourseDetails(database);
+                    break;
+                case 22:
                     admin.printEmployeeDetails();
                     break;
                 case 0:
