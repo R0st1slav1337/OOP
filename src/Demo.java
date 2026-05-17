@@ -341,6 +341,11 @@ public class Demo {
                     student.printStudentDetails();
                     break;
                 case 15:
+                    if (!student.canParticipateInResearch()) {
+                        System.out.println("Research activity is available only for 4th year students.");
+                        break;
+                    }
+
                     researchMenu(database, student, student);
                     break;
                 case 0:

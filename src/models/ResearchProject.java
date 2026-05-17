@@ -22,6 +22,14 @@ public class ResearchProject implements Serializable {
             throw new NotResearcherException("Only researchers can join research project.");
         }
 
+        if (user instanceof Student) {
+            Student student = (Student) user;
+
+            if (!student.canParticipateInResearch()) {
+                throw new NotResearcherException("Only 4th year students can join research projects.");
+            }
+        }
+
         Researcher researcher = (Researcher) user;
 
         if (!participants.contains(researcher)) {

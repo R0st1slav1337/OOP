@@ -199,6 +199,10 @@ public class Student extends User implements Researcher {
         return year == 4;
     }
 
+    public boolean canParticipateInResearch() {
+        return year == 4;
+    }
+
     public Researcher getSupervisor() {
         return supervisor;
     }
@@ -591,10 +595,25 @@ public class Student extends User implements Researcher {
 
     @Override
     public void addResearchPaper(ResearchPaper paper) {
-        researchPapers.add(paper);
+        if (!canParticipateInResearch()) {
+            System.out.println("Only 4th year students can add research papers.");
+            Database.getInstance().addLog(
+                "RESEARCH: " + getFullName() + " tried to add a research paper, but student is not 4th year."
+            );
+            return;
+        }
+
+        if (paper == null) {
+            System.out.println("Research paper does not exist.");
+            return;
+        }
+
+        if (!researchPapers.contains(paper)) {
+            researchPapers.add(paper);
+        }
+
         Database.getInstance().addLog(
-            "RESEARCH: " + getFullName() +
-            " added research paper '" + paper.getTitle() + "'"
+            "RESEARCH: " + getFullName() + " added research paper '" + paper.getTitle() + "'"
         );
     }
 
@@ -605,13 +624,25 @@ public class Student extends User implements Researcher {
 
     @Override
     public void addResearchProject(ResearchProject project) {
+        if (!canParticipateInResearch()) {
+            System.out.println("Only 4th year students can join research projects.");
+            Database.getInstance().addLog(
+                "RESEARCH: " + getFullName() + " tried to join a research project, but student is not 4th year."
+            );
+            return;
+        }
+
+        if (project == null) {
+            System.out.println("Research project does not exist.");
+            return;
+        }
+
         if (!researchProjects.contains(project)) {
             researchProjects.add(project);
         }
-        
+
         Database.getInstance().addLog(
-            "RESEARCH: " + getFullName() +
-            " joined research project '" + project.getTopic() + "'"
+            "RESEARCH: " + getFullName() + " joined research project '" + project.getTopic() + "'"
         );
     }
 
