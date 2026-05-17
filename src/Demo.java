@@ -1756,20 +1756,6 @@ public class Demo {
         return user;
     }
 
-    private static Student selectStudent(Database database) {
-        System.out.print("Student username: ");
-        String username = readLine();
-
-        User user = database.findUserByUsername(username);
-
-        if (!(user instanceof Student)) {
-            System.out.println("Student not found.");
-            return null;
-        }
-
-        return (Student) user;
-    }
-
     private static Teacher selectTeacher(Database database) {
         System.out.print("Teacher username: ");
         String username = readLine();
