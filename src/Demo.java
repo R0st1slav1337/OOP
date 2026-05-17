@@ -1311,22 +1311,15 @@ public class Demo {
     // Helper method for adding a new research paper by researcher with paper
     // details input and paper creation
     private static void addResearchPaper(Database database, User user, Researcher researcher) {
-        System.out.print("Paper title: ");
-        String title = readLine();
-
-        System.out.print("Journal: ");
-        String journal = readLine();
-
-        System.out.print("Pages: ");
-        int pages = readInt();
-
-        System.out.print("Citations: ");
-        int citations = readInt();
+        String title = readRequiredLine("Paper title: ");
+        String journal = readRequiredLine("Journal: ");
+        
+        int pages = readIntInRange("Pages: ", 1, 500);
+        int citations = readIntInRange("Citations: ", 0, 100000);
 
         LocalDate publicationDate = readDate();
 
-        System.out.print("DOI: ");
-        String doi = readLine();
+        String doi = readRequiredLine("DOI: ");
 
         if (database.findResearchPaperByDoi(doi) != null) {
             System.out.println("Research paper with this DOI already exists.");
@@ -1397,8 +1390,7 @@ public class Demo {
     // Helper method for creating a research project by researcher with project
     // topic input, project creation, and joining the project
     private static void createResearchProject(Database database, User user, Researcher researcher) {
-        System.out.print("Project topic: ");
-        String topic = readLine();
+        String topic = readRequiredLine("Project topic: ");
 
         if (database.findResearchProjectByTopic(topic) != null) {
             System.out.println("Research project with this topic already exists.");
@@ -1406,10 +1398,10 @@ public class Demo {
         }
 
         ResearchProject project = new ResearchProject(topic);
-        database.addResearchProject(project);
 
         try {
             researcher.joinProject(project);
+            database.addResearchProject(project);
             System.out.println("Research project created and joined successfully.");
         } catch (NotResearcherException e) {
             System.out.println(e.getMessage());
