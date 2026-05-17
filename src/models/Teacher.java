@@ -25,7 +25,14 @@ public class Teacher extends Employee implements Researcher {
     }
 
     public void assignCourse(Course course) {
-        courses.add(course);
+        if (course == null) {
+            return;
+        }
+
+        if (!courses.contains(course)) {
+            courses.add(course);
+        }
+
         course.addInstructor(this);
     }
 

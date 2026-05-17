@@ -918,7 +918,10 @@ public class Demo {
     // Helper method for viewing students for a course by teacher with course
     // selection and students display
     private static void viewStudentsForCourse(Database database, Teacher teacher) {
-        Course course = selectCourse(database);
+        Course course = selectCourseFromList(
+            teacher.getCourses(),
+            "Courses assigned to you:"
+        );
 
         if (course == null) {
             return;
@@ -930,7 +933,10 @@ public class Demo {
     // Helper method for viewing attendance report for a course by teacher with
     // course selection and attendance report display
     private static void viewAttendanceReport(Database database, Teacher teacher) {
-        Course course = selectCourse(database);
+        Course course = selectCourseFromList(
+            teacher.getCourses(),
+            "Courses assigned to you:"
+        );
 
         if (course == null) {
             return;
@@ -1053,15 +1059,21 @@ public class Demo {
     // Helper method for putting a mark for a student by teacher with student
     // selection, course selection, and mark input
     private static void putMark(Database database, Teacher teacher) {
-        Student student = selectStudent(database);
+        Course course = selectCourseFromList(
+                teacher.getCourses(),
+                "Courses assigned to you:"
+        );
 
-        if (student == null) {
+        if (course == null) {
             return;
         }
 
-        Course course = selectCourse(database);
+        Student student = selectStudentFromList(
+                course.getStudents(),
+                "Students registered for this course:"
+        );
 
-        if (course == null) {
+        if (student == null) {
             return;
         }
 
@@ -1080,7 +1092,10 @@ public class Demo {
     // Helper method for creating a lesson by teacher with course selection, lesson
     // details input, and lesson creation
     private static void createLesson(Database database, Teacher teacher) {
-        Course course = selectCourse(database);
+        Course course = selectCourseFromList(
+            teacher.getCourses(),
+            "Courses assigned to you:"
+        );
 
         if (course == null) {
             return;
@@ -1090,7 +1105,6 @@ public class Demo {
         String topic = readLine();
 
         LessonType type = readEnum(LessonType.class, "Choose lesson type");
-
         LocalDateTime dateTime = readDateTime();
 
         System.out.print("Room: ");
@@ -1102,7 +1116,10 @@ public class Demo {
     // Helper method for marking attendance for a lesson by teacher with course
     // selection, lesson selection, student selection, and attendance marking
     private static void markAttendance(Database database, Teacher teacher) {
-        Course course = selectCourse(database);
+        Course course = selectCourseFromList(
+                teacher.getCourses(),
+                "Courses assigned to you:"
+        );
 
         if (course == null) {
             return;
@@ -1130,7 +1147,10 @@ public class Demo {
 
         Lesson lesson = lessons.get(lessonIndex);
 
-        Student student = selectStudent(database);
+        Student student = selectStudentFromList(
+                course.getStudents(),
+                "Students registered for this course:"
+        );
 
         if (student == null) {
             return;
@@ -1158,7 +1178,10 @@ public class Demo {
             return;
         }
 
-        Course course = selectCourse(database);
+        Course course = selectCourseFromList(
+                getRateableCourses(student, teacher),
+                "Courses where you can rate this teacher:"
+        );
 
         if (course == null) {
             return;
@@ -1806,6 +1829,71 @@ public class Demo {
         }
 
         return projects.get(index);
+    }
+
+    private static Course selectCourseFromList(List<Course> courses, String title) {
+        if (courses == null || courses.isEmpty()) {
+            System.out.println("No courses available for this action.");
+            return null;
+        }
+
+        System.out.println(title);
+        System.out.println("--------------------------------");
+
+        for (Course course : courses) {
+            System.out.println(course);
+        }
+
+        System.out.print("Course code: ");
+        String code = readLine();
+
+        for (Course course : courses) {
+            if (course.getCode().equalsIgnoreCase(code)) {
+                return course;
+            }
+        }
+
+        System.out.println("This course is not available for this action.");
+        return null;
+    }
+
+    private static Student selectStudentFromList(List<Student> students, String title) {
+        if (students == null || students.isEmpty()) {
+            System.out.println("No students available for this action.");
+            return null;
+        }
+
+        System.out.println(title);
+        System.out.println("--------------------------------");
+
+        for (Student student : students) {
+            System.out.println(student.getUsername() + " - " + student.getFullName());
+        }
+
+        System.out.print("Student username: ");
+        String username = readLine();
+
+        for (Student student : students) {
+            if (student.getUsername().equalsIgnoreCase(username)) {
+                return student;
+            }
+        }
+
+        System.out.println("This student is not available for this action.");
+        return null;
+    }
+
+    private static List<Course> getRateableCourses(Student student, Teacher teacher) {
+        List<Course> result = new ArrayList<>();
+
+        for (Course course : student.getCourses()) {
+            if (course.getInstructors().contains(teacher)
+                    && !teacher.hasRatingFrom(student, course)) {
+                result.add(course);
+            }
+        }
+
+        return result;
     }
 
     // Helper method for viewing user details by username with user selection and
