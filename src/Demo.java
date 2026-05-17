@@ -139,14 +139,11 @@ public class Demo {
 
         switch (userType) {
             case STUDENT:
-                System.out.print("Year: ");
-                int year = readInt();
+                int year = readIntInRange("Year: ", 1, 4);
 
-                System.out.print("Major: ");
-                String major = readLine();
+                String major = readMajorOrAll("Major: ");
 
-                System.out.print("H-index: ");
-                int studentHIndex = readInt();
+                int studentHIndex = readIntInRange("H-index: ", 0, 1000);
 
                 return UserFactory.createStudent(
                         id,
@@ -158,16 +155,14 @@ public class Demo {
                         studentHIndex);
 
             case TEACHER:
-                System.out.print("Salary: ");
-                double teacherSalary = readDouble();
+                double teacherSalary = readDoubleInRange("Salary: ", 0, 10000000);
 
                 System.out.print("Department: ");
                 String teacherDepartment = readLine();
 
                 TeacherTitle title = readEnum(TeacherTitle.class, "Choose teacher title");
 
-                System.out.print("H-index: ");
-                int teacherHIndex = readInt();
+                int teacherHIndex = readIntInRange("H-index: ", 0, 1000);
 
                 return UserFactory.createTeacher(
                         id,
@@ -180,8 +175,7 @@ public class Demo {
                         teacherHIndex);
 
             case MANAGER:
-                System.out.print("Salary: ");
-                double managerSalary = readDouble();
+                double managerSalary = readDoubleInRange("Salary: ", 0, 100000000);
 
                 System.out.print("Department: ");
                 String managerDepartment = readLine();
@@ -198,8 +192,7 @@ public class Demo {
                         managerType);
 
             case ADMIN:
-                System.out.print("Salary: ");
-                double adminSalary = readDouble();
+                double adminSalary = readDoubleInRange("Salary: ", 0, 100000000);
 
                 System.out.print("Department: ");
                 String adminDepartment = readLine();
@@ -213,8 +206,7 @@ public class Demo {
                         adminDepartment);
 
             case EMPLOYEE:
-                System.out.print("Salary: ");
-                double employeeSalary = readDouble();
+                double employeeSalary = readDoubleInRange("Salary: ", 0, 100000000);
 
                 System.out.print("Department: ");
                 String employeeDepartment = readLine();
@@ -228,8 +220,7 @@ public class Demo {
                         employeeDepartment);
 
             case RESEARCH_EMPLOYEE:
-                System.out.print("Salary: ");
-                double researchEmployeeSalary = readDouble();
+                double researchEmployeeSalary = readDoubleInRange("Salary: ", 0, 100000000);
 
                 System.out.print("Department: ");
                 String researchEmployeeDepartment = readLine();
@@ -1011,28 +1002,22 @@ public class Demo {
     // Helper method for adding a new course by manager with course details input
     // and course creation
     private static void addCourse(Database database) {
-        System.out.print("Course code: ");
-        String code = readLine();
+        String code = readRequiredLine("Course code: ");
 
         if (database.findCourseByCode(code) != null) {
             System.out.println("Course with this code already exists.");
             return;
         }
 
-        System.out.print("Course name: ");
-        String name = readLine();
+        String name = readRequiredLine("Course name: ");
 
-        System.out.print("Credits: ");
-        int credits = readInt();
+        int credits = readIntInRange("Credits: ", 1, 6);
 
-        System.out.print("Intended major (or ALL): ");
-        String intendedMajor = readLine();
+        String intendedMajor = readMajorOrAll("Intended major (or ALL): ");
 
-        System.out.print("Intended year (0 for ALL): ");
-        int intendedYear = readInt();
+        int intendedYear = readIntInRange("Intended year (0 for ALL): ", 0, 4);
 
-        System.out.print("Capacity: ");
-        int capacity = readInt();
+        int capacity = readIntInRange("Capacity: ", 1, 150);
 
         Course course = new Course(code, name, credits, intendedMajor, intendedYear, capacity);
         database.addCourse(course);
@@ -1075,14 +1060,9 @@ public class Demo {
             return;
         }
 
-        System.out.print("1st attestation: ");
-        double first = readDouble();
-
-        System.out.print("2nd attestation: ");
-        double second = readDouble();
-
-        System.out.print("Final exam: ");
-        double finalExam = readDouble();
+        double first = readDoubleInRange("1st attestation: ", 0, 30);
+        double second = readDoubleInRange("2nd attestation: ", 0, 30);
+        double finalExam = readDoubleInRange("Final exam: ", 0, 40);
 
         try {
             Mark mark = new Mark(first, second, finalExam);
@@ -1179,8 +1159,7 @@ public class Demo {
             return;
         }
 
-        System.out.print("Rating 1-5: ");
-        int rating = readInt();
+        int rating = readIntInRange("Rating 1-5: ", 1, 5);
 
         System.out.print("Comment: ");
         String comment = readLine();
@@ -2040,6 +2019,61 @@ public class Demo {
             }
 
             System.out.println("Wrong option.");
+        }
+    }
+
+    private static int readIntInRange(String prompt, int min, int max) {
+        while (true) {
+            System.out.print(prompt);
+            int value = readInt();
+
+            if (value >= min && value <= max) {
+                return value;
+            }
+
+            System.out.println("Value must be between " + min + " and " + max + ".");
+        }
+    }
+
+    private static double readDoubleInRange(String prompt, double min, double max) {
+        while (true) {
+            System.out.print(prompt);
+            double value = readDouble();
+
+            if (value >= min && value <= max) {
+                return value;
+            }
+
+            System.out.println("Value must be between " + min + " and " + max + ".");
+        }
+    }
+
+    private static String readRequiredLine(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String value = readLine();
+
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+
+            System.out.println("Value cannot be empty.");
+        }
+    }
+
+    private static String readMajorOrAll(String prompt) {
+        while (true) {
+            String major = readRequiredLine(prompt);
+
+            if (major.equalsIgnoreCase("ALL")) {
+                return "ALL";
+            }
+
+            if (major.matches("[A-Za-zА-Яа-я ]{2,}")) {
+                return major;
+            }
+
+            System.out.println("Major must contain letters only, or enter ALL.");
         }
     }
 }
