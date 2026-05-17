@@ -501,26 +501,27 @@ public class Demo {
             System.out.println("15. Show top cited researcher by school");
             System.out.println("16. Show top cited researcher by school and year");
             System.out.println("17. Show all researchers");
+            System.out.println("18. Assign research supervisor");
             System.out.println();
             System.out.println("--- News ---");
-            System.out.println("18. Create news");
+            System.out.println("19. Create news");
             System.out.println();
             System.out.println("--- Employee Requests ---");
-            System.out.println("19. View signed employee requests");
-            System.out.println("20. Approve signed employee request");
-            System.out.println("21. Reject signed employee request");
-            System.out.println("22. View sent requests");
+            System.out.println("20. View signed employee requests");
+            System.out.println("21. Approve signed employee request");
+            System.out.println("22. Reject signed employee request");
+            System.out.println("23. View sent requests");
             System.out.println();
             System.out.println("--- Communication ---");
-            System.out.println("23. View inbox");
-            System.out.println("24. View sent messages");
-            System.out.println("25. Send message to employee");
-            System.out.println("26. Send complaint");
-            System.out.println("27. View sent complaints");
+            System.out.println("24. View inbox");
+            System.out.println("25. View sent messages");
+            System.out.println("26. Send message to employee");
+            System.out.println("27. Send complaint");
+            System.out.println("28. View sent complaints");
             System.out.println();
             System.out.println("--- Search / Profile ---");
-            System.out.println("28. View user details");
-            System.out.println("29. View my profile");
+            System.out.println("29. View user details");
+            System.out.println("30. View my profile");
             System.out.println();
             System.out.println("0. Logout");
             System.out.print("Choose option: ");
@@ -580,39 +581,42 @@ public class Demo {
                     database.printAllResearchers();
                     break;
                 case 18:
-                    createNews(manager);
+                    assignResearchSupervisor(database);
                     break;
                 case 19:
-                    manager.viewSignedRequests();
+                    createNews(manager);
                     break;
                 case 20:
-                    processEmployeeRequest(database, manager, true);
+                    manager.viewSignedRequests();
                     break;
                 case 21:
-                    processEmployeeRequest(database, manager, false);
+                    processEmployeeRequest(database, manager, true);
                     break;
                 case 22:
-                    manager.viewSentRequests();
+                    processEmployeeRequest(database, manager, false);
                     break;
                 case 23:
-                    manager.viewInbox();
+                    manager.viewSentRequests();
                     break;
                 case 24:
-                    manager.viewSentMessages();
+                    manager.viewInbox();
                     break;
                 case 25:
-                    sendEmployeeMessage(database, manager);
+                    manager.viewSentMessages();
                     break;
                 case 26:
-                    sendEmployeeComplaint(database, manager);
+                    sendEmployeeMessage(database, manager);
                     break;
                 case 27:
-                    manager.viewSentComplaints();
+                    sendEmployeeComplaint(database, manager);
                     break;
                 case 28:
-                    viewUserDetails(database);
+                    manager.viewSentComplaints();
                     break;
                 case 29:
+                    viewUserDetails(database);
+                    break;
+                case 30:
                     manager.printEmployeeDetails();
                     break;
                 case 0:
@@ -770,14 +774,15 @@ public class Demo {
             System.out.println("--- Requests ---");
             System.out.println("7. Create employee request");
             System.out.println("8. View sent requests");
+            System.out.println("9. Sign employee request");
             System.out.println();
             System.out.println("--- Info ---");
-            System.out.println("9. View news");
-            System.out.println("10. View my profile");
+            System.out.println("10. View news");
+            System.out.println("11. View my profile");
             if (employee instanceof Researcher) {
                 System.out.println();
                 System.out.println("--- Research ---");
-                System.out.println("11. Research menu");
+                System.out.println("12. Research menu");
             }
             System.out.println();
             System.out.println("0. Logout");
@@ -811,12 +816,15 @@ public class Demo {
                     employee.viewSentRequests();
                     break;
                 case 9:
-                    employee.viewNews();
+                    signEmployeeRequest(database, employee);
                     break;
                 case 10:
-                    employee.printEmployeeDetails();
+                    employee.viewNews();
                     break;
                 case 11:
+                    employee.printEmployeeDetails();
+                    break;
+                case 12:
                     if (employee instanceof Researcher) {
                         researchMenu(database, employee, (Researcher) employee);
                     } else {
@@ -853,9 +861,10 @@ public class Demo {
             System.out.println("7. View my research projects");
             System.out.println("8. Add my paper to research project");
             System.out.println("9. View project papers");
+            System.out.println("10. View project participants");
             System.out.println();
             System.out.println("--- University Research ---");
-            System.out.println("10. Show all university papers by citations");
+            System.out.println("11. Show all university papers by citations");
             System.out.println();
             System.out.println("0. Back");
             System.out.print("Choose option: ");
@@ -891,6 +900,9 @@ public class Demo {
                     viewProjectPapers(database);
                     break;
                 case 10:
+                    viewProjectParticipants(database);
+                    break;
+                case 11:
                     database.printAllResearchPapers(ResearchPaperComparators.BY_CITATIONS);
                     break;
                 case 0:
@@ -1009,6 +1021,42 @@ public class Demo {
             manager.approveRegistration(registration);
         } else {
             manager.rejectRegistration(registration);
+        }
+    }
+
+    // Helper method for assigning a research supervisor to a 4th year student by
+    private static void assignResearchSupervisor(Database database) {
+        System.out.print("Student username: ");
+        String studentUsername = readLine();
+
+        User studentUser = database.findUserByUsername(studentUsername);
+
+        if (!(studentUser instanceof Student)) {
+            System.out.println("Student not found.");
+            return;
+        }
+
+        Student student = (Student) studentUser;
+
+        if (!student.needsSupervisor()) {
+            System.out.println("Only 4th year students need a research supervisor.");
+            return;
+        }
+
+        System.out.print("Supervisor username: ");
+        String supervisorUsername = readLine();
+
+        User supervisorUser = database.findUserByUsername(supervisorUsername);
+
+        if (!(supervisorUser instanceof Researcher)) {
+            System.out.println("Selected user is not a researcher.");
+            return;
+        }
+
+        try {
+            student.setSupervisor((Researcher) supervisorUser);
+        } catch (LowHIndexException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -1343,6 +1391,17 @@ public class Demo {
         System.out.println("Research paper added successfully.");
     }
 
+    // Helper method for viewing participants of a research project by researcher with
+    private static void viewProjectParticipants(Database database) {
+        ResearchProject project = selectResearchProject(database);
+
+        if (project == null) {
+            return;
+        }
+
+        project.printParticipants();
+    }
+
     // Helper method for printing research papers of a researcher by researcher with
     // papers display sorted by the given comparator
     private static void printResearchPapers(Researcher researcher, java.util.Comparator<ResearchPaper> comparator) {
@@ -1460,11 +1519,8 @@ public class Demo {
     // Helper method for creating news by manager with news details input and news
     // creation
     private static void createNews(Manager manager) {
-        System.out.print("News title: ");
-        String title = readLine();
-
-        System.out.print("News content: ");
-        String content = readLine();
+        String title = readRequiredLine("News title: ");
+        String content = readRequiredLine("News content: ");
 
         manager.createNews(title, content);
     }
