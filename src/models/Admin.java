@@ -108,9 +108,4 @@ public class Admin extends Employee {
     public void viewLogs(Database database) {
         database.printLogs();
     }
-
-    @Override
-    public void showMenu() {
-        System.out.println("Admin menu");
-    }
 }

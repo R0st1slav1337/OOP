@@ -26,8 +26,6 @@ public abstract class User implements Serializable, NewsObserver {
         return this.username.equals(username) && this.password.equals(password);
     }
 
-    public abstract void showMenu();
-
     public String getId() {
         return id;
     }

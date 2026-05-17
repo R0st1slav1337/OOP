@@ -344,8 +344,4 @@ public class Manager extends Employee {
         return registrations;
     }
 
-    @Override
-    public void showMenu() {
-        System.out.println("Manager menu");
-    }
 }

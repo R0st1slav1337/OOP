@@ -361,10 +361,5 @@ public class Teacher extends Employee implements Researcher {
     public String getDepartment() {
         return department;
     }
-
-    @Override
-    public void showMenu() {
-        System.out.println("Teacher menu");
-    }
     
 }

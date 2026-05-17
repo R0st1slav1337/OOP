@@ -333,10 +333,4 @@ public class Employee extends User {
     public List<Complaint> getSentComplaints() {
         return sentComplaints;
     }
-
-    @Override
-    public void showMenu() {
-        System.out.println("Employee menu");
-    }
-    
 }

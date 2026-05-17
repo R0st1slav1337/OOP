@@ -613,8 +613,4 @@ public class Student extends User implements Researcher {
         );
     }
 
-    @Override
-    public void showMenu() {
-        System.out.println("Student menu");
-    }
 }
