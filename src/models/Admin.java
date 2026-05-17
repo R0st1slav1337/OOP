@@ -3,6 +3,7 @@ package models;
 import java.util.List;
 
 public class Admin extends Employee {
+    private static final long serialVersionUID = 1L;
 
     public Admin(String id, String username, String password, String fullName, double salary, String department) {
         super(id, username, password, fullName, salary, department);

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Manager extends Employee {
+    private static final long serialVersionUID = 1L;
+
     private ManagerType managerType;
     private List<Registration> registrations = new ArrayList<>();
 

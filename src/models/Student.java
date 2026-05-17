@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Student extends User implements Researcher {
+    private static final long serialVersionUID = 1L;
+
     private int year;
     private double gpa;
     private int totalCredits;

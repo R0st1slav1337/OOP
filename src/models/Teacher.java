@@ -8,6 +8,8 @@ import enums.TeacherTitle;
 import enums.LessonType;
 
 public class Teacher extends Employee implements Researcher {
+    private static final long serialVersionUID = 1L;
+
     private TeacherTitle title;
     private List<Course> courses = new ArrayList<>();
     private List<ResearchPaper> researchPapers = new ArrayList<>();

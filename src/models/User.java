@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class User implements Serializable, NewsObserver {
+    private static final long serialVersionUID = 1L;
+
     protected String id;
     protected String username;
     protected String password;

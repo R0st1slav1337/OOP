@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Employee extends User {
+    private static final long serialVersionUID = 1L;
+
     protected double salary;
     protected String department;
 
