@@ -225,8 +225,7 @@ public class Demo {
                 System.out.print("Department: ");
                 String researchEmployeeDepartment = readLine();
 
-                System.out.print("H-index: ");
-                int researchEmployeeHIndex = readInt();
+                int researchEmployeeHIndex = readIntInRange("H-index: ", 0, 1000);
 
                 return UserFactory.createResearchEmployee(
                         id,
@@ -906,7 +905,10 @@ public class Demo {
     // Helper method for viewing teachers for a course by student with course
     // selection and teachers display
     private static void viewTeachersForCourse(Database database, Student student) {
-        Course course = selectCourse(database);
+        Course course = selectCourseFromList(
+                student.getCourses(),
+                "Your registered courses:"
+        );
 
         if (course == null) {
             return;
